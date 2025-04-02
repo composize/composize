@@ -1,0 +1,22 @@
+{
+  "name": "@composize/excel",
+  "version": "0.0.0",
+  "sideEffects": false,
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/composize/composize.git"
+  },
+  "bugs": {
+    "url": "https://github.com/composize/composize/issues"
+  },
+  "homepage": "https://github.com/composize/composize",
+  "publishConfig": {
+    "access": "public"
+  },
+  "dependencies": {
+    "tslib": "^2.3.0"
+  },
+  "peerDependencies": {
+    "exceljs": "^4.4.0"
+  }
+}
