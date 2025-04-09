@@ -36,7 +36,7 @@ export function worksheet(name: string, composable: () => void) {
 }
 
 export function row(composable: () => void) {
-  // 如何还没创建工作表，则将当前行挂起
+  // 如果还没创建工作表，则将当前行挂起
   if (!currentWorksheet) {
     suspendRows.push(() => row(composable));
     return;
@@ -112,6 +112,6 @@ function autoFitColumns() {
         maxLength = Math.max(maxLength, width * (fontSize / defaultFontSize));
       }
     });
-    column.width = maxLength;
+    column.width = maxLength + 2; // 预留2个字符的间距
   }
 }
