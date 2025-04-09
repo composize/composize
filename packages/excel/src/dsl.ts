@@ -95,15 +95,22 @@ export function cell(value: any, options?: CellOptions) {
  * 根据每一列中最长的单元格内容设置宽度
  */
 function autoFitColumns() {
+  const defaultFontSize = 11; // 默认字体大小
   for (const column of currentWorksheet.columns) {
-    let maxLength = 10;
+    let maxLength = 8.43; // 默认宽度
     column.eachCell?.({ includeEmpty: true }, cell => {
-      const cellValue = cell.value ? cell.value.toString() : '';
-      // 如果单元格设置了字体大小，使用它，否则默认 11
-      const fontSize = cell.font?.size || 11;
-      const width = [...cellValue].map(char => isChineseOrPunctuation(char) ? 1.9 : 1).reduce((a, b) => a + b, 0);
-      // 这里只做简单处理，每个字符占位1，可根据实际情况作优化
-      maxLength = Math.max(maxLength, width * (fontSize / 11));
+      // 如果单元格是合并单元格，则跳过宽度计算，改为允许换行
+      if (cell.isMerged) {
+        cell.alignment = { wrapText: true, ...cell.alignment }
+      } else {
+        const cellValue = cell.value ? cell.value.toString() : '';
+        // 如果单元格设置了字体大小，使用它，否则默认 11
+        const fontSize = cell.font?.size || defaultFontSize;
+
+        const width = [...cellValue].map(char => isChineseOrPunctuation(char) ? 2 : 1).reduce((a, b) => a + b, 0);
+        // 这里只做简单处理，每个字符占位1，可根据实际情况作优化
+        maxLength = Math.max(maxLength, width * (fontSize / defaultFontSize));
+      }
     });
     column.width = maxLength;
   }
