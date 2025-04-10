@@ -5,6 +5,9 @@
   "references": [
     {
       "path": "./packages/excel"
+    },
+    {
+      "path": "./packages/dom"
     }
   ]
 }
