@@ -101,7 +101,7 @@ export function text(content: NonNullable<Content>) {
 
 export function style(styles: Record<string, Partial<CSSStyleDeclaration>>) {
   const node = document.createElement('style');
-  node.innerHTML = cssObjectToText(styles);
+  node.textContent = cssObjectToText(styles);
   getCurrentElement()?.append(node);
   return node;
 }
