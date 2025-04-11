@@ -1,4 +1,4 @@
-import { cell, row, workbook, worksheet } from './dsl';
+import { borderedCell, cell, row, workbook, worksheet } from './dsl';
 
 describe('Excel DSL', () => {
 
@@ -223,4 +223,22 @@ describe('Excel DSL', () => {
     expect(book.worksheets[0].getRow(4).getCell(1).value).toBe('value3');
     expect(book.worksheets[0].getRow(4).getCell(1).isMerged).toBeFalsy();
   })
+
+  it('should create a bordered cell with thin borders and additional options', () => {
+    const book = workbook(() => {
+      row(() => {
+        borderedCell('bordered', { numFmt: '0.00' });
+      });
+    });
+
+    const sheet = book.worksheets[0];
+    const createdCell = sheet.getRow(1).getCell(1);
+
+    expect(createdCell.value).toBe('bordered');
+    expect(createdCell.numFmt).toBe('0.00');
+    expect(createdCell.border?.top?.style).toBe('thin');
+    expect(createdCell.border?.left?.style).toBe('thin');
+    expect(createdCell.border?.bottom?.style).toBe('thin');
+    expect(createdCell.border?.right?.style).toBe('thin');
+  });
 });

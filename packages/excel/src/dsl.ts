@@ -46,9 +46,9 @@ export function row(composable: () => void) {
   currentRowNumber++;
 }
 
-export type CellOptions = Partial<{ colSpan: number, rowSpan: number } & Pick<Cell, 'style' | 'alignment'>>
+export type CellOptions = Partial<{ colSpan: number, rowSpan: number } & Pick<Cell, 'numFmt' | 'font' | 'alignment' | 'border' | 'fill'>>
 
-export function cell(value: any, options?: CellOptions) {
+export function cell(value: any, options: CellOptions = {}) {
   // 如果当前列被标记跳过，则自动跳过所有跳过的单元格
   while (mergedCells.get(currentRowNumber)?.has(currentColNumber)) {
     currentColNumber++;
@@ -57,14 +57,7 @@ export function cell(value: any, options?: CellOptions) {
   // 给当前单元格赋值
   const cellRef = row.getCell(currentColNumber);
   cellRef.value = value;
-  // 设置样式
-  if (options?.style) {
-    cellRef.style = options.style
-  }
-  // 设置对齐方式
-  if (options?.alignment) {
-    cellRef.alignment = options.alignment;
-  }
+  Object.assign(cellRef, options)
   // 处理合并单元格
   const colSpan = options?.colSpan || 1;
   const rowSpan = options?.rowSpan || 1;
@@ -89,6 +82,18 @@ export function cell(value: any, options?: CellOptions) {
   }
   // 切换到下一个单元格（跨列合并时，直接跳过合并的区域）
   currentColNumber += colSpan;
+}
+
+export function borderedCell(value: any, options: CellOptions = {}) {
+  return cell(value, {
+    border: {
+      top: { style: 'thin' },
+      left: { style: 'thin' },
+      bottom: { style: 'thin' },
+      right: { style: 'thin' }
+    },
+    ...options
+  })
 }
 
 /**
