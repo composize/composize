@@ -82,6 +82,7 @@ export function cell(value: any, options: CellOptions = {}) {
   }
   // 切换到下一个单元格（跨列合并时，直接跳过合并的区域）
   currentColNumber += colSpan;
+  return cellRef;
 }
 
 export function borderedCell(value: any, options: CellOptions = {}) {
