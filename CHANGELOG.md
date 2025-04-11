@@ -1,3 +1,14 @@
+## 0.0.6 (2025-04-11)
+
+### 🚀 Features
+
+- **excel:** add bordered cell function ([d4d8aa3](https://github.com/composize/composize/commit/d4d8aa3))
+- **excel:** return cell ref ([2b7ae39](https://github.com/composize/composize/commit/2b7ae39))
+
+### ❤️ Thank You
+
+- HyperLife1119 @HyperLife1119
+
 ## 0.0.5 (2025-04-10)
 
 ### 🩹 Fixes
