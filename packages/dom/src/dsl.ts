@@ -106,6 +106,14 @@ export function style(styles: Record<string, Partial<CSSStyleDeclaration>>) {
   return node;
 }
 
+export function listener<K extends keyof HTMLElementEventMap>(
+  eventName: K,
+  handler: (event: HTMLElementEventMap[K]) => void,
+  options?: AddEventListenerOptions | boolean
+) {
+  getCurrentElement().addEventListener(eventName, handler as EventListener, options);
+}
+
 function kebabCase(str: string) {
   return str.replace(/([a-z])([A-Z])/g, '$1-$2').toLowerCase();
 }

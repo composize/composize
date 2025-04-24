@@ -1,4 +1,4 @@
-import { element, fragment, style, text } from './dsl'
+import { element, fragment, listener, style, text } from './dsl'
 
 describe('DOM DSL', () => {
   it('should create an element with text content', () => {
@@ -139,5 +139,53 @@ describe('DOM DSL', () => {
       expect(div.childNodes[1].textContent).toBe('third text');
     });
 
+    describe('listener', () => {
+      it('should add an event listener to the current element', () => {
+        const handler = vi.fn();
+        const div = element('div', () => {
+          listener('click', handler);
+        });
+
+        const clickEvent = new MouseEvent('click');
+        div.dispatchEvent(clickEvent);
+
+        expect(handler).toHaveBeenCalledTimes(1);
+        expect(handler).toHaveBeenCalledWith(clickEvent);
+      });
+
+      it('should add an event listener with options', () => {
+        const handler = vi.fn();
+        const div = element('div', () => {
+          listener('click', handler, { once: true });
+        });
+
+        const clickEvent1 = new MouseEvent('click');
+        div.dispatchEvent(clickEvent1);
+        const clickEvent2 = new MouseEvent('click');
+        div.dispatchEvent(clickEvent2);
+
+        expect(handler).toHaveBeenCalledTimes(1);
+        expect(handler).toHaveBeenCalledWith(clickEvent1);
+      });
+
+      it('should add multiple event listeners', () => {
+        const clickHandler = vi.fn();
+        const mouseoverHandler = vi.fn();
+        const div = element('div', () => {
+          listener('click', clickHandler);
+          listener('mouseover', mouseoverHandler);
+        });
+
+        const clickEvent = new MouseEvent('click');
+        div.dispatchEvent(clickEvent);
+        const mouseoverEvent = new MouseEvent('mouseover');
+        div.dispatchEvent(mouseoverEvent);
+
+        expect(clickHandler).toHaveBeenCalledTimes(1);
+        expect(clickHandler).toHaveBeenCalledWith(clickEvent);
+        expect(mouseoverHandler).toHaveBeenCalledTimes(1);
+        expect(mouseoverHandler).toHaveBeenCalledWith(mouseoverEvent);
+      });
+    });
   });
 })
