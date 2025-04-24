@@ -1,90 +1,103 @@
-# Composize
+# composize
 
-<a alt="Nx logo" href="https://nx.dev" target="_blank" rel="noreferrer"><img src="https://raw.githubusercontent.com/nrwl/nx/master/images/nx-logo.png" width="45"></a>
+![CI](https://github.com/composize/composize/actions/workflows/ci.yml/badge.svg)
+![License](https://img.shields.io/badge/License-MIT-blue.svg)
+[![CodeFactor](https://www.codefactor.io/repository/github/composize/composize/badge)](https://www.codefactor.io/repository/github/composize/composize)
 
-✨ Your new, shiny [Nx workspace](https://nx.dev) is almost ready ✨.
+A set of composable & declarative DSLs.
 
-[Learn more about this workspace setup and its capabilities](https://nx.dev/nx-api/js?utm_source=nx_project&amp;utm_medium=readme&amp;utm_campaign=nx_projects) or run `npx nx graph` to visually explore what was created. Now, let's get you up to speed!
+## Packages
 
-## Finish your CI setup
+| Package                                                                               | Intro                                                 | Version                                                                                                                |
+| ------------------------------------------------------------------------------------- | ----------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------- |
+| [`@composize/dom`](https://github.com/composize/composize/tree/main/packages/dom)     | DSL for DOM                                           | [![version](https://img.shields.io/npm/v/@composize/dom/latest.svg)](https://www.npmjs.com/package/@composize/dom)     |
+| [`@composize/excel`](https://github.com/composize/composize/tree/main/packages/excel) | DSL for [ExcelJS](https://github.com/exceljs/exceljs) | [![version](https://img.shields.io/npm/v/@composize/excel/latest.svg)](https://www.npmjs.com/package/@composize/excel) |
 
-[Click here to finish setting up your workspace!](https://cloud.nx.app/connect/yum5e3YNgo)
+&nbsp; ☝️ Click the links above to view the README for each package.
 
+## APIs
 
-## Generate a library
+For the full API definition, please visit [https://composize.github.io/composize](https://composize.github.io/composize).
 
-```sh
-npx nx g @nx/js:lib packages/pkg1 --publishable --importPath=@my-org/pkg1
+## Examples
+
+### @composize/dom
+
+```ts
+import { fragment, element, text, style, listener } from '@composize/dom';
+
+const node = fragment(() => {
+  style({
+    '.card': {
+      border: '1px solid #ccc',
+      padding: '16px',
+      marginBottom: '12px',
+    }
+  });
+
+  function Card(title: string, content: string) {
+    element('div', { class: 'card' }, () => {
+      element('h2', { class: 'card-title' }, title);
+      element('p', content);
+    });
+  }
+
+  for (let index = 0; index < 3; index++) {
+    Card('Card title', 'This is a simple card.');
+  }
+
+  element('button', { style: { backgroundColor: 'blue' } }, () => {
+    text('Click me');
+    listener('click', () => {
+      console.log('Button clicked!');
+    });
+  });
+});
 ```
 
-## Run tasks
+## @composize/excel
 
-To build the library use:
+```ts
+import { cell, row, workbook } from '@composize/excel';
+// +--------+--------+--------+
+// |                 | title2 |
+// |      title1     +--------+
+// |                 | title3 |
+// +--------+--------+--------+
+// | value1 |                 |
+// +--------+      value2     +
+// | value3 |                 |
+// +--------+-----------------+
+const book = workbook(() => {
+  row(() => {
+    cell('title1', { rowSpan: 2, colSpan: 2 });
+    cell('title2');
+  });
+  row(() => {
+    cell('title3');
+  });
+  row(() => {
+    cell('value1');
+    cell('value2', { rowSpan: 2, colSpan: 2 });
+  })
+  row(() => {
+    cell('value3');
+  })
+});
 
-```sh
-npx nx build pkg1
+book.xlsx.writeFile('./sheet.xlsx');
 ```
 
-To run any task with Nx use:
+## Changelog
 
-```sh
-npx nx <target> <project-name>
-```
+[Learn about the latest improvements.](https://github.com/composize/composize/blob/main/CHANGELOG.md)
 
-These targets are either [inferred automatically](https://nx.dev/concepts/inferred-tasks?utm_source=nx_project&utm_medium=readme&utm_campaign=nx_projects) or defined in the `project.json` or `package.json` files.
+##  Special thanks
 
-[More about running tasks in the docs &raquo;](https://nx.dev/features/run-tasks?utm_source=nx_project&utm_medium=readme&utm_campaign=nx_projects)
+Thanks to [JetBrains](https://www.jetbrains.com/?from=composize) for supporting us free open source licenses.
 
-## Versioning and releasing
+![JetBrains Logo](https://resources.jetbrains.com/storage/products/company/brand/logos/jb_beam.svg)
 
-To version and release the library use
+## License
 
-```
-npx nx release
-```
-
-Pass `--dry-run` to see what would happen without actually releasing the library.
-
-[Learn more about Nx release &raquo;](hhttps://nx.dev/features/manage-releases?utm_source=nx_project&utm_medium=readme&utm_campaign=nx_projects)
-
-## Keep TypeScript project references up to date
-
-Nx automatically updates TypeScript [project references](https://www.typescriptlang.org/docs/handbook/project-references.html) in `tsconfig.json` files to ensure they remain accurate based on your project dependencies (`import` or `require` statements). This sync is automatically done when running tasks such as `build` or `typecheck`, which require updated references to function correctly.
-
-To manually trigger the process to sync the project graph dependencies information to the TypeScript project references, run the following command:
-
-```sh
-npx nx sync
-```
-
-You can enforce that the TypeScript project references are always in the correct state when running in CI by adding a step to your CI job configuration that runs the following command:
-
-```sh
-npx nx sync:check
-```
-
-[Learn more about nx sync](https://nx.dev/reference/nx-commands#sync)
-
-
-[Learn more about Nx on CI](https://nx.dev/ci/intro/ci-with-nx#ready-get-started-with-your-provider?utm_source=nx_project&utm_medium=readme&utm_campaign=nx_projects)
-
-## Install Nx Console
-
-Nx Console is an editor extension that enriches your developer experience. It lets you run tasks, generate code, and improves code autocompletion in your IDE. It is available for VSCode and IntelliJ.
-
-[Install Nx Console &raquo;](https://nx.dev/getting-started/editor-setup?utm_source=nx_project&utm_medium=readme&utm_campaign=nx_projects)
-
-## Useful links
-
-Learn more:
-
-- [Learn more about this workspace setup](https://nx.dev/nx-api/js?utm_source=nx_project&amp;utm_medium=readme&amp;utm_campaign=nx_projects)
-- [Learn about Nx on CI](https://nx.dev/ci/intro/ci-with-nx?utm_source=nx_project&utm_medium=readme&utm_campaign=nx_projects)
-- [Releasing Packages with Nx release](https://nx.dev/features/manage-releases?utm_source=nx_project&utm_medium=readme&utm_campaign=nx_projects)
-- [What are Nx plugins?](https://nx.dev/concepts/nx-plugins?utm_source=nx_project&utm_medium=readme&utm_campaign=nx_projects)
-
-And join the Nx community:
-- [Discord](https://go.nx.dev/community)
-- [Follow us on X](https://twitter.com/nxdevtools) or [LinkedIn](https://www.linkedin.com/company/nrwl)
-- [Our Youtube channel](https://www.youtube.com/@nxdevtools)
-- [Our blog](https://nx.dev/blog?utm_source=nx_project&utm_medium=readme&utm_campaign=nx_projects)
+[MIT](https://github.com/composize/composize/blob/main/LICENSE)
