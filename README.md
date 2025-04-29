@@ -55,7 +55,7 @@ const node = fragment(() => {
 });
 ```
 
-## @composize/excel
+### @composize/excel
 
 ```ts
 import { cell, row, workbook } from '@composize/excel';
