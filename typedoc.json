@@ -13,5 +13,8 @@
   "excludeInternal": true,
   "githubPages": true,
   "readme": "./README.md",
-  "categorizeByGroup": false
+  "categorizeByGroup": false,
+  "plugin": [
+    "typedoc-plugin-mermaid"
+  ]
 }
