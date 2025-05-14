@@ -1,4 +1,4 @@
-import { borderedCell, cell, row, workbook, worksheet } from './dsl';
+import { borderedCell, cell, centeredCell, row, workbook, worksheet } from './dsl';
 
 describe('Excel DSL', () => {
 
@@ -241,4 +241,25 @@ describe('Excel DSL', () => {
     expect(createdCell.border?.bottom?.style).toBe('thin');
     expect(createdCell.border?.right?.style).toBe('thin');
   });
+
+  it('should create a centered cell with thin borders and centered alignment', () => {
+    const book = workbook(() => {
+      row(() => {
+        centeredCell('centered', { numFmt: '0.00%' });
+      });
+    });
+
+    const sheet = book.worksheets[0];
+    const createdCell = sheet.getRow(1).getCell(1);
+
+    expect(createdCell.value).toBe('centered');
+    expect(createdCell.numFmt).toBe('0.00%');
+    expect(createdCell.border?.top?.style).toBe('thin');
+    expect(createdCell.border?.left?.style).toBe('thin');
+    expect(createdCell.border?.bottom?.style).toBe('thin');
+    expect(createdCell.border?.right?.style).toBe('thin');
+    expect(createdCell.alignment?.horizontal).toBe('center');
+    expect(createdCell.alignment?.vertical).toBe('middle');
+  });
+
 });

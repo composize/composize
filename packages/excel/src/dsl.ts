@@ -81,7 +81,7 @@ export type CellOptions = Partial<{ colSpan: number, rowSpan: number } & Pick<Ce
 /**
  * Creates and configures a cell within the current worksheet at the current row and column position.
  *
- * @param value The value to be placed into the cell. Can be of any type supported by exceljs.
+ * @param value The value to be placed into the cell.
  * @param options Optional configuration for the cell.
  * @returns The `exceljs.Cell` object that was created and configured.
  */
@@ -124,7 +124,7 @@ export function cell(value: any, options: CellOptions = {}) {
 /**
  * Creates a cell object with a thin border applied to all four sides.
  *
- * @param value - The value to be placed into the cell. Can be of any type supported by exceljs.
+ * @param value - The value to be placed into the cell.
  * @param options - Optional configuration for the cell.
  * @returns The `exceljs.Cell` object that was created and configured.
  */
@@ -138,6 +138,19 @@ export function borderedCell(value: any, options: CellOptions = {}) {
     },
     ...options
   })
+}
+
+/**
+ * Creates a cell configuration with content centered horizontally and vertically.
+ *
+ * @param value - The value to be placed into the cell.
+ * @param options - Optional configuration for the cell.
+ */
+export function centeredCell(value: any, options: CellOptions = {}) {
+  return borderedCell(value, {
+    alignment: { horizontal: 'center', vertical: 'middle' },
+    ...options
+  });
 }
 
 const DEFAULT_FONT_SIZE = 11;
