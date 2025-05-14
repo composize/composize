@@ -1,3 +1,15 @@
+## 0.0.7 (2025-05-14)
+
+### 🚀 Features
+
+- **dom:** add listener function ([904da33](https://github.com/composize/composize/commit/904da33))
+- **excel:** add more documents ([74a8507](https://github.com/composize/composize/commit/74a8507))
+- **excel:** add centeredCell function ([6bcda0c](https://github.com/composize/composize/commit/6bcda0c))
+
+### ❤️ Thank You
+
+- HyperLife1119 @HyperLife1119
+
 ## 0.0.6 (2025-04-11)
 
 ### 🚀 Features

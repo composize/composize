@@ -1,3 +1,14 @@
+## 0.0.7 (2025-05-14)
+
+### 🚀 Features
+
+- **excel:** add centeredCell function ([6bcda0c](https://github.com/composize/composize/commit/6bcda0c))
+- **excel:** add more documents ([74a8507](https://github.com/composize/composize/commit/74a8507))
+
+### ❤️ Thank You
+
+- HyperLife1119 @HyperLife1119
+
 ## 0.0.6 (2025-04-11)
 
 ### 🚀 Features

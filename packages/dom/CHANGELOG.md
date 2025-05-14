@@ -1,3 +1,13 @@
+## 0.0.7 (2025-05-14)
+
+### 🚀 Features
+
+- **dom:** add listener function ([904da33](https://github.com/composize/composize/commit/904da33))
+
+### ❤️ Thank You
+
+- HyperLife1119 @HyperLife1119
+
 ## 0.0.6 (2025-04-11)
 
 This was a version bump only for dom to align it with other projects, there were no code changes.
