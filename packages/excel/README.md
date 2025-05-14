@@ -67,6 +67,7 @@ The `@composize/excel` DSL includes the following key features:
 | `row()`          | Adds a new row to the current worksheet          | `composable: () => void`               | `Row`       |
 | `cell()`         | Adds a cell to the current row                   | `value: string, options?: CellOptions` | `Cell`      |
 | `borderedCell()` | Adds a cell with thin borders to the current row | `value: string, options?: CellOptions` | `Cell`      |
+| `centeredCell()` | Adds a centered cell to the current row          | `value: string, options?: CellOptions` | `Cell`      |
 
 ### CellOptions
 
