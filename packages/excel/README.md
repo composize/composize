@@ -223,6 +223,19 @@ row(() => {
 
 The `borderedCell()` function accepts the same options as `cell()`, but automatically adds thin borders.
 
+### Centered Cells
+
+For convenience, DSL also provides a `centeredCell()` function, which builds on top of `borderedCell()` and applies centered alignment to the cell.
+
+```ts
+row(() => {
+  centeredCell('Centered Text');
+  centeredCell('Custom Format', { numFmt: '0.00' });
+});
+```
+
+The `centeredCell()` function accepts the same options as `borderedCell()`, but automatically adds centered alignment.
+
 ## Auto-fitting Columns
 
 The Excel DSL automatically adjusts column widths based on the content of each cell. For merged cells, auto-fitting enables text wrapping instead of increasing width.
@@ -236,10 +249,9 @@ const book = workbook(() => {
   worksheet('Report', () => {
     // Header row with merged title
     row(() => {
-      cell('Quarterly Report', {
+      centeredCell('Quarterly Report', {
         colSpan: 4,
-        font: { bold: true, size: 16 },
-        alignment: { horizontal: 'center' }
+        font: { bold: true, size: 16 }
       });
     });
 
@@ -248,10 +260,10 @@ const book = workbook(() => {
 
     // Column headers
     row(() => {
-      borderedCell('Category', { font: { bold: true } });
-      borderedCell('Q1', { font: { bold: true } });
-      borderedCell('Q2', { font: { bold: true } });
-      borderedCell('Q3', { font: { bold: true } });
+      const headers = ['Category', 'Q1', 'Q2', 'Q3'];
+      for (const header of headers) {
+        borderedCell(header, { font: { bold: true } });
+      }
     });
 
     // Data rows
