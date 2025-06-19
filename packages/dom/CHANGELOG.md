@@ -1,3 +1,13 @@
+## 0.0.8 (2025-06-19)
+
+### 🚀 Features
+
+- **dom:** add inlineStyle function ([a3d0956](https://github.com/composize/composize/commit/a3d0956))
+
+### ❤️ Thank You
+
+- HyperLife1119 @HyperLife1119
+
 ## 0.0.7 (2025-05-14)
 
 ### 🚀 Features

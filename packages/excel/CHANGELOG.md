@@ -1,3 +1,7 @@
+## 0.0.8 (2025-06-19)
+
+This was a version bump only for excel to align it with other projects, there were no code changes.
+
 ## 0.0.7 (2025-05-14)
 
 ### 🚀 Features
