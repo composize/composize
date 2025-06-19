@@ -52,6 +52,7 @@ graph LR
     worksheet --> row
     row --> cell
     row --> borderedCell
+    row --> centeredCell
 ```
 
 The `@composize/excel` DSL uses a functional composition pattern where parent elements accept callback functions that define their children. This creates a natural nesting structure that makes the code's visual layout reflect the structure of the resulting Excel document.
