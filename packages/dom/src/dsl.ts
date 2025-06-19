@@ -7,9 +7,9 @@ type IfEquals<X, Y, A = X> = (<T>() => T extends X ? 1 : 2) extends (<T>() => T 
 type Props<K extends keyof HTMLElementTagNameMap> = Partial<PickWritable<Omit<HTMLElementTagNameMap[K], 'style'>> & { class: string[] | string, style: Partial<CSSStyleDeclaration> }>;
 type Content = string | number | undefined | null
 
-const nodeStack: ParentNode[] = [];
+const nodeStack: HTMLElement[] = [];
 
-function enterElement(element: ParentNode) {
+function enterElement(element: HTMLElement) {
   nodeStack.push(element);
 }
 
@@ -83,7 +83,7 @@ export function element<K extends keyof HTMLElementTagNameMap>(tag: K, propsOrCo
 
 export function fragment(composable?: () => void) {
   const node = document.createDocumentFragment();
-  enterElement(node);
+  enterElement(node as unknown as HTMLElement);
   try {
     composable?.()
   } finally {
@@ -104,6 +104,11 @@ export function style(styles: Record<string, Partial<CSSStyleDeclaration>>) {
   node.textContent = cssObjectToText(styles);
   getCurrentElement()?.append(node);
   return node;
+}
+
+export function inlineStyle(styles: Partial<CSSStyleDeclaration>) {
+  const node = getCurrentElement()
+  Object.assign(node.style, styles)
 }
 
 export function listener<K extends keyof HTMLElementEventMap>(

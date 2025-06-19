@@ -1,4 +1,4 @@
-import { element, fragment, listener, style, text } from './dsl'
+import { element, fragment, inlineStyle, listener, style, text } from './dsl'
 
 describe('DOM DSL', () => {
   it('should create an element with text content', () => {
@@ -185,6 +185,44 @@ describe('DOM DSL', () => {
         expect(clickHandler).toHaveBeenCalledWith(clickEvent);
         expect(mouseoverHandler).toHaveBeenCalledTimes(1);
         expect(mouseoverHandler).toHaveBeenCalledWith(mouseoverEvent);
+      });
+
+      describe('inlineStyle', () => {
+        it('should apply inline styles to the current element', () => {
+          const div = element('div', () => {
+            inlineStyle({ color: 'red', backgroundColor: 'blue' });
+          });
+          expect(div.style.color).toBe('red');
+          expect(div.style.backgroundColor).toBe('blue');
+        });
+
+        it('should override existing styles on the current element', () => {
+          const div = element('div', { style: { color: 'green', fontSize: '12px' } }, () => {
+            inlineStyle({ color: 'purple', fontWeight: 'bold' });
+          });
+          expect(div.style.color).toBe('purple');
+          expect(div.style.fontSize).toBe('12px');
+          expect(div.style.fontWeight).toBe('bold');
+        });
+
+        it('should not throw if styles object is empty', () => {
+          const div = element('div', () => {
+            expect(() => inlineStyle({})).not.toThrow();
+          });
+          expect(div.style.length).toBe(0);
+        });
+
+        it('should only apply styles to the most recently entered element', () => {
+          const outerDiv = element('div', () => {
+            element('span', () => {
+              inlineStyle({ color: 'orange' });
+            });
+          });
+          const innerDiv = outerDiv.querySelector('span');
+          expect(innerDiv).not.toBeNull();
+          expect((innerDiv as HTMLSpanElement).style.color).toBe('orange');
+          expect(outerDiv.style.color).toBe('');
+        });
       });
     });
   });
