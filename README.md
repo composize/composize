@@ -24,7 +24,7 @@ For the full API definition, please visit [https://composize.github.io/composize
 ### @composize/dom
 
 ```ts
-import { attributes, element, fragment, inlineStyle, listener, style, text } from './dsl';
+import { attributes, element, fragment, inlineStyle, listener, style, text } from '@composize/dom';
 
 function Card(title: string, content: string) {
   element('div', { class: 'card' }, () => {
@@ -37,7 +37,7 @@ function Card(title: string, content: string) {
 
     element('p', content);
 
-    element('button', { style: { backgroundColor: 'blue' } }, () => {
+    element('button', { style: { color: 'blue' } }, () => {
       text('Action');
       listener('click', () => {
         console.log('Button clicked!');
