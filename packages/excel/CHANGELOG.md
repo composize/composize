@@ -1,3 +1,13 @@
+## 0.0.9 (2025-06-21)
+
+### 🚀 Features
+
+- **dom:** add attributes & append APIs ([6284531](https://github.com/composize/composize/commit/6284531))
+
+### ❤️ Thank You
+
+- HyperLife1119 @HyperLife1119
+
 ## 0.0.8 (2025-06-19)
 
 This was a version bump only for excel to align it with other projects, there were no code changes.
