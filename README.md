@@ -24,34 +24,41 @@ For the full API definition, please visit [https://composize.github.io/composize
 ### @composize/dom
 
 ```ts
-import { fragment, element, text, style, listener } from '@composize/dom';
+import { attributes, element, fragment, inlineStyle, listener, style, text } from './dsl';
 
-const node = fragment(() => {
+function Card(title: string, content: string) {
+  element('div', { class: 'card' }, () => {
+    attributes({ 'data-id': 'card-1' });
+
+    element('h3', () => {
+      inlineStyle({ color: '#333' });
+      text(title);
+    });
+
+    element('p', content);
+
+    element('button', { style: { backgroundColor: 'blue' } }, () => {
+      text('Action');
+      listener('click', () => {
+        console.log('Button clicked!');
+      });
+    });
+  });
+}
+
+fragment(() => {
   style({
     '.card': {
-      border: '1px solid #ccc',
-      padding: '16px',
-      marginBottom: '12px',
+      border: '1px solid #e0e0e0',
+      borderRadius: '8px',
+      padding: '20px',
+      width: '300px',
     }
   });
 
-  function Card(title: string, content: string) {
-    element('div', { class: 'card' }, () => {
-      element('h2', { class: 'card-title' }, title);
-      element('p', content);
-    });
-  }
-
   for (let index = 0; index < 3; index++) {
-    Card('Card title', 'This is a simple card.');
+    Card('Declarative Cards', 'Declaratively DOM using DSL.');
   }
-
-  element('button', { style: { backgroundColor: 'blue' } }, () => {
-    text('Click me');
-    listener('click', () => {
-      console.log('Button clicked!');
-    });
-  });
 });
 ```
 

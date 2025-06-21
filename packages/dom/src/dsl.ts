@@ -4,36 +4,38 @@ type PickWritable<T> = {
 // 辅助类型：判断属性是否为 `readonly`
 type IfEquals<X, Y, A = X> = (<T>() => T extends X ? 1 : 2) extends (<T>() => T extends Y ? 1 : 2) ? A : never;
 
-type Props<K extends keyof HTMLElementTagNameMap> = Partial<PickWritable<Omit<HTMLElementTagNameMap[K], 'style'>> & { class: string[] | string, style: Partial<CSSStyleDeclaration> }>;
-type Content = string | number | undefined | null
+type NodeProps<K extends keyof HTMLElementTagNameMap> = Partial<PickWritable<Omit<HTMLElementTagNameMap[K], 'style'>> & { class: string[] | string, style: Partial<CSSStyleDeclaration> }>;
+type Content = Node | string | number | undefined | null
 
-const nodeStack: HTMLElement[] = [];
+const nodeStack: ParentNode[] = [];
 
-function enterElement(element: HTMLElement) {
+function enterNode(element: ParentNode) {
   nodeStack.push(element);
 }
 
-function leaveElement() {
+function leaveNode() {
   nodeStack.pop();
 }
 
-function getCurrentElement() {
+function getCurrentNode() {
   return nodeStack[nodeStack.length - 1];
 }
 
-export function element<K extends keyof HTMLElementTagNameMap>(tag: K, props?: Props<K>): HTMLElementTagNameMap[K];
+export function element<K extends keyof HTMLElementTagNameMap>(tag: K, props?: NodeProps<K>): HTMLElementTagNameMap[K];
 export function element<K extends keyof HTMLElementTagNameMap>(tag: K, content?: Content): HTMLElementTagNameMap[K];
 export function element<K extends keyof HTMLElementTagNameMap>(tag: K, composable?: () => void): HTMLElementTagNameMap[K];
-export function element<K extends keyof HTMLElementTagNameMap>(tag: K, props?: Props<K>, content?: Content): HTMLElementTagNameMap[K];
-export function element<K extends keyof HTMLElementTagNameMap>(tag: K, props?: Props<K>, composable?: () => void): HTMLElementTagNameMap[K];
-export function element<K extends keyof HTMLElementTagNameMap>(tag: K, propsOrContentOrComposable?: Props<K> | Content | (() => void), contentOrComposable?: Content | (() => void)) {
+export function element<K extends keyof HTMLElementTagNameMap>(tag: K, props?: NodeProps<K>, content?: Content): HTMLElementTagNameMap[K];
+export function element<K extends keyof HTMLElementTagNameMap>(tag: K, props?: NodeProps<K>, composable?: () => void): HTMLElementTagNameMap[K];
+export function element<K extends keyof HTMLElementTagNameMap>(tag: K, propsOrContentOrComposable?: NodeProps<K> | Content | (() => void), contentOrComposable?: Content | (() => void)) {
   const node = document.createElement(tag);
 
-  let props: Props<K> | undefined;
+  let props: NodeProps<K> | undefined;
   let content: Content = undefined
   let composable: (() => void) | undefined = undefined;
 
-  if (typeof propsOrContentOrComposable === 'object' && propsOrContentOrComposable) {
+  if (propsOrContentOrComposable instanceof Node) {
+    contentOrComposable = propsOrContentOrComposable;
+  } else if (typeof propsOrContentOrComposable === 'object' && propsOrContentOrComposable) {
     props = propsOrContentOrComposable
   } else {
     contentOrComposable = propsOrContentOrComposable
@@ -66,16 +68,18 @@ export function element<K extends keyof HTMLElementTagNameMap>(tag: K, propsOrCo
     }
   }
 
-  enterElement(node);
+  enterNode(node);
   try {
     if (composable) {
       composable()
+    } else if (content instanceof Node) {
+      node.append(content);
     } else if (content) {
       text(content)
     }
   } finally {
-    leaveElement()
-    getCurrentElement()?.append(node);
+    leaveNode()
+    getCurrentNode()?.append(node);
   }
 
   return node;
@@ -83,32 +87,50 @@ export function element<K extends keyof HTMLElementTagNameMap>(tag: K, propsOrCo
 
 export function fragment(composable?: () => void) {
   const node = document.createDocumentFragment();
-  enterElement(node as unknown as HTMLElement);
+  enterNode(node);
   try {
     composable?.()
   } finally {
-    leaveElement()
-    getCurrentElement()?.append(node);
+    leaveNode()
+    getCurrentNode()?.append(node);
   }
   return node;
 }
 
 export function text(content: NonNullable<Content>) {
   const node = document.createTextNode(content.toString());
-  getCurrentElement()?.append(node);
+  getCurrentNode()?.append(node);
   return node;
 }
 
 export function style(styles: Record<string, Partial<CSSStyleDeclaration>>) {
   const node = document.createElement('style');
   node.textContent = cssObjectToText(styles);
-  getCurrentElement()?.append(node);
+  getCurrentNode()?.append(node);
   return node;
 }
 
 export function inlineStyle(styles: Partial<CSSStyleDeclaration>) {
-  const node = getCurrentElement()
+  const node = getCurrentNode() as HTMLElement;
   Object.assign(node.style, styles)
+}
+
+export function attributes(attrs: Record<string, string | number | boolean>) {
+  const node = getCurrentNode() as HTMLElement;
+  for (const [key, value] of Object.entries(attrs)) {
+    node.setAttribute(key, value.toString());
+  }
+}
+
+export function append(node: ParentNode, composable?: () => void) {
+  enterNode(node);
+  try {
+    composable?.()
+  } finally {
+    leaveNode()
+    getCurrentNode()?.append(node);
+  }
+  return node;
 }
 
 export function listener<K extends keyof HTMLElementEventMap>(
@@ -116,7 +138,7 @@ export function listener<K extends keyof HTMLElementEventMap>(
   handler: (event: HTMLElementEventMap[K]) => void,
   options?: AddEventListenerOptions | boolean
 ) {
-  getCurrentElement().addEventListener(eventName, handler as EventListener, options);
+  getCurrentNode().addEventListener(eventName, handler as EventListener, options);
 }
 
 function kebabCase(str: string) {

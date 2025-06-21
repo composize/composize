@@ -1,40 +1,53 @@
-import { element, fragment, inlineStyle, listener, style, text } from './dsl'
+import { append, attributes, element, fragment, inlineStyle, listener, style, text } from './dsl'
 
 describe('DOM DSL', () => {
-  it('should create an element with text content', () => {
-    const div = element('div', 'hello')
+  describe('element', () => {
+    it('should create an element with text content', () => {
+      const div = element('div', 'hello')
 
-    expect(div.tagName).toBe('DIV')
-    expect(div.textContent).toBe('hello')
-  })
-
-  it('should create an element with props (class and style) and text content', () => {
-    const div = element('div', { class: ['my-class'], style: { backgroundColor: 'red' } }, 'world')
-    expect(div.tagName).toBe('DIV')
-    expect(div.className).toBe('my-class')
-    expect(div.style.backgroundColor).toBe('red')
-    expect(div.textContent).toBe('world')
-  })
-
-  it('should create an element using a composable function', () => {
-    const div = element('div', () => {
-      element('span', 'child')
+      expect(div.tagName).toBe('DIV')
+      expect(div.textContent).toBe('hello')
     })
-    expect(div.tagName).toBe('DIV')
-    expect(div.children.length).toBe(1)
-    const span = div.querySelector('span')
-    expect(span!.textContent).toBe('child')
-  })
 
-  it('should support nested composition', () => {
-    const div = element('div', () => {
-      element('p', () => {
-        element('strong', 'nested text')
+    it('should append a child element', () => {
+      const p = document.createElement('p');
+      p.textContent = 'I am appended';
+
+      const div = element('div', p);
+
+      expect(div.children.length).toBe(1);
+      expect(div.firstElementChild).toBe(p);
+      expect(div.textContent).toBe('I am appended');
+    })
+
+    it('should create an element with props (class and style) and text content', () => {
+      const div = element('div', { class: ['my-class'], style: { backgroundColor: 'red' } }, 'world')
+      expect(div.tagName).toBe('DIV')
+      expect(div.className).toBe('my-class')
+      expect(div.style.backgroundColor).toBe('red')
+      expect(div.textContent).toBe('world')
+    })
+
+    it('should create an element using a composable function', () => {
+      const div = element('div', () => {
+        element('span', 'child')
       })
+      expect(div.tagName).toBe('DIV')
+      expect(div.children.length).toBe(1)
+      const span = div.querySelector('span')
+      expect(span!.textContent).toBe('child')
     })
-    expect(div.tagName).toBe('DIV')
-    const strong = div.querySelector('p > strong')
-    expect(strong!.textContent).toBe('nested text')
+
+    it('should support nested composition', () => {
+      const div = element('div', () => {
+        element('p', () => {
+          element('strong', 'nested text')
+        })
+      })
+      expect(div.tagName).toBe('DIV')
+      const strong = div.querySelector('p > strong')
+      expect(strong!.textContent).toBe('nested text')
+    })
   })
 
   describe('text', () => {
@@ -222,6 +235,92 @@ describe('DOM DSL', () => {
           expect(innerDiv).not.toBeNull();
           expect((innerDiv as HTMLSpanElement).style.color).toBe('orange');
           expect(outerDiv.style.color).toBe('');
+        });
+      });
+
+      describe('attributes', () => {
+        it('should set attributes on the current element', () => {
+          const div = element('div', () => {
+            attributes({
+              'data-id': '123',
+              'tabindex': 0,
+              'disabled': true,
+            });
+          });
+          expect(div.getAttribute('data-id')).toBe('123');
+          expect(div.getAttribute('tabindex')).toBe('0');
+          expect(div.getAttribute('disabled')).toBe('true');
+        });
+
+        it('should overwrite existing attributes', () => {
+          const div = element('div', () => {
+            attributes({ 'data-test': 'initial' });
+            attributes({ 'data-test': 'overwritten' });
+          });
+          expect(div.getAttribute('data-test')).toBe('overwritten');
+        });
+
+        it('should only apply attributes to the most recently entered element', () => {
+          const outerDiv = element('div', () => {
+            attributes({ 'data-outer': 'true' });
+            element('span', () => {
+              attributes({ 'data-inner': 'true' });
+            });
+          });
+          const innerSpan = outerDiv.querySelector('span');
+
+          expect(outerDiv.getAttribute('data-outer')).toBe('true');
+          expect(outerDiv.hasAttribute('data-inner')).toBe(false);
+
+          expect(innerSpan).not.toBeNull();
+          expect((innerSpan as HTMLSpanElement).getAttribute('data-inner')).toBe('true');
+          expect((innerSpan as HTMLSpanElement).hasAttribute('data-outer')).toBe(false);
+        });
+      });
+
+      describe('append', () => {
+        it('should append an existing node to the current element', () => {
+          const p = document.createElement('p');
+          p.textContent = 'I am appended';
+
+          const div = element('div', () => {
+            append(p);
+          });
+
+          expect(div.children.length).toBe(1);
+          expect(div.firstElementChild).toBe(p);
+          expect(div.textContent).toBe('I am appended');
+        });
+
+        it('should allow adding children to the appended node via a composable', () => {
+          const article = document.createElement('article');
+
+          const div = element('div', () => {
+            append(article, () => {
+              element('h1', 'Title');
+              text('Some content.');
+            });
+          });
+
+          expect(div.children.length).toBe(1);
+          expect(div.firstElementChild).toBe(article);
+          expect(article.children.length).toBe(1);
+          expect(article.childNodes.length).toBe(2);
+          const h1 = article.querySelector('h1');
+          expect(h1).not.toBeNull();
+          expect(h1!.textContent).toBe('Title');
+          expect(article.textContent).toBe('TitleSome content.');
+        });
+
+        it('should return the appended node', () => {
+          const p = document.createElement('p');
+          let returnedNode: Node | undefined;
+
+          element('div', () => {
+            returnedNode = append(p);
+          });
+
+          expect(returnedNode).toBe(p);
         });
       });
     });
