@@ -57,7 +57,7 @@ fragment(() => {
   });
 
   for (let index = 0; index < 3; index++) {
-    Card('Declarative Cards', 'Declaratively DOM using DSL.');
+    Card('Declarative Cards', 'Declaratively create DOM using DSL.');
   }
 });
 ```
