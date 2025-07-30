@@ -1,3 +1,13 @@
+## 0.0.10 (2025-07-30)
+
+### 🚀 Features
+
+- **excel:** add standard color ([5328443](https://github.com/composize/composize/commit/5328443))
+
+### ❤️ Thank You
+
+- HyperLife1119 @HyperLife1119
+
 ## 0.0.9 (2025-06-21)
 
 ### 🚀 Features
