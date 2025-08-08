@@ -4,7 +4,7 @@
  * These colors are represented in ARGB format.
  * The first two characters represent the alpha channel (opacity).
  */
-export const StandardColor = {
+export const Color = {
   /** #c00000 */
   DarkRed: 'ffc00000',
   /** #ff0000 */
