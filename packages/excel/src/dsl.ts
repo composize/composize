@@ -1,4 +1,5 @@
 import { Cell, Workbook, Worksheet } from 'exceljs';
+import { DEFAULT_COLUMN_WIDTH, DEFAULT_FONT_SIZE } from './constants';
 import { isChineseOrPunctuation } from './utils';
 
 let currentWorkbook: Workbook
@@ -153,12 +154,9 @@ export function centeredCell(value: any, options: CellOptions = {}) {
   });
 }
 
-const DEFAULT_FONT_SIZE = 11;
-const DEFAULT_COL_WIDTH = 8.43;
-
 function autoFitColumns() {
   for (const column of currentWorksheet.columns) {
-    let maxLength = DEFAULT_COL_WIDTH;
+    let maxLength = DEFAULT_COLUMN_WIDTH;
     column.eachCell?.(cell => {
       // If the cell is a merged cell, skip the width calculation and allow line breaks
       if (cell.isMerged) {
