@@ -48,24 +48,7 @@ export function element<K extends keyof HTMLElementTagNameMap>(tag: K, propsOrCo
   }
 
   if (props) {
-    for (const [key, value] of Object.entries(props)) {
-      switch (key) {
-        case 'class':
-          if (Array.isArray(value)) {
-            node.className = value.join(' ');
-          } else {
-            node.className = value;
-          }
-          break;
-        case 'style':
-          for (const [styleKey, styleValue] of Object.entries(value as CSSStyleDeclaration)) {
-            node.style.setProperty(kebabCase(styleKey), styleValue)
-          }
-          break;
-        default:
-          node[key as keyof HTMLElementTagNameMap[K]] = value;
-      }
-    }
+    applyProps(node, props);
   }
 
   enterNode(node);
@@ -83,6 +66,27 @@ export function element<K extends keyof HTMLElementTagNameMap>(tag: K, propsOrCo
   }
 
   return node;
+}
+
+function applyProps<K extends keyof HTMLElementTagNameMap>(node: HTMLElementTagNameMap[K], props: NodeProps<K>) {
+  for (const [key, value] of Object.entries(props)) {
+    switch (key) {
+      case 'class':
+        if (Array.isArray(value)) {
+          node.className = value.join(' ');
+        } else {
+          node.className = value;
+        }
+        break;
+      case 'style':
+        for (const [styleKey, styleValue] of Object.entries(value as CSSStyleDeclaration)) {
+          node.style.setProperty(kebabCase(styleKey), styleValue)
+        }
+        break;
+      default:
+        node[key as keyof HTMLElementTagNameMap[K]] = value;
+    }
+  }
 }
 
 export function fragment(composable?: () => void) {
