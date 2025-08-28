@@ -1,4 +1,4 @@
-import { Cell, Workbook, Worksheet } from 'exceljs';
+import { Cell, CellValue, Workbook, Worksheet } from 'exceljs';
 import { DEFAULT_COLUMN_WIDTH, DEFAULT_FONT_SIZE } from './constants';
 import { isChineseOrPunctuation } from './utils';
 
@@ -86,7 +86,7 @@ export type CellOptions = Partial<{ colSpan: number, rowSpan: number } & Pick<Ce
  * @param options Optional configuration for the cell.
  * @returns The `exceljs.Cell` object that was created and configured.
  */
-export function cell(value: any, options: CellOptions = {}) {
+export function cell(value: CellValue, options: CellOptions = {}) {
   // If the current column is marked as skipped, automatically skip all skipped cells
   while (mergedCells.get(currentRowNumber)?.has(currentColNumber)) {
     currentColNumber++;
@@ -129,7 +129,7 @@ export function cell(value: any, options: CellOptions = {}) {
  * @param options - Optional configuration for the cell.
  * @returns The `exceljs.Cell` object that was created and configured.
  */
-export function borderedCell(value: any, options: CellOptions = {}) {
+export function borderedCell(value: CellValue, options: CellOptions = {}) {
   return cell(value, {
     border: {
       top: { style: 'thin' },
@@ -147,7 +147,7 @@ export function borderedCell(value: any, options: CellOptions = {}) {
  * @param value - The value to be placed into the cell.
  * @param options - Optional configuration for the cell.
  */
-export function centeredCell(value: any, options: CellOptions = {}) {
+export function centeredCell(value: CellValue, options: CellOptions = {}) {
   return borderedCell(value, {
     alignment: { horizontal: 'center', vertical: 'middle' },
     ...options
