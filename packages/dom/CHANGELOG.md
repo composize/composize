@@ -1,3 +1,7 @@
+## 0.0.11 (2025-09-25)
+
+This was a version bump only for dom to align it with other projects, there were no code changes.
+
 ## 0.0.10 (2025-07-30)
 
 ### 🚀 Features

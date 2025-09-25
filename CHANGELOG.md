@@ -1,3 +1,13 @@
+## 0.0.11 (2025-09-25)
+
+### 🚀 Features
+
+- **excel:** add FontSize enum ([8378c24](https://github.com/composize/composize/commit/8378c24))
+
+### ❤️ Thank You
+
+- HyperLife1119 @HyperLife1119
+
 ## 0.0.10 (2025-07-30)
 
 ### 🚀 Features
