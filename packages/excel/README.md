@@ -159,7 +159,15 @@ workbook(() => {
 });
 ```
 
-This creates a header cell that spans across three columns.
+This creates a header cell that spans across three columns:
+
+```
++--------+--------+--------+
+|       Wide Header        |
+|--------------------------+
+| Data 1 | Data 2 | Data 3 |
++--------+-----------------+
+```
 
 ### Vertical Merging (Row Span)
 
@@ -178,7 +186,15 @@ workbook(() => {
 });
 ```
 
-This creates a cell that spans two rows in the first column.
+This creates a cell that spans two rows in the first column:
+
+```
++--------+--------+-------------+
+|                 | Top Cell    |
+|    Tall Cell    +-------------+
+|                 | Bottom Cell |
++--------+--------+-------------+
+```
 
 ### Combined Merging
 
@@ -187,16 +203,35 @@ You can combine both horizontal and vertical merging:
 ```ts
 workbook(() => {
   row(() => {
-    cell('Large Cell', { rowSpan: 2, colSpan: 2 });
-    cell('Top Right');
+    cell('Header 1', { rowSpan: 2, colSpan: 2 });
+    cell('Header 2');
   });
   row(() => {
-    cell('Bottom Right');
+    cell('Header 3');
   });
+  row(() => {
+    cell('Data 1');
+    cell('Data 2', { rowSpan: 2, colSpan: 2 });
+  })
+  row(() => {
+    cell('Data 3');
+  })
 });
 ```
 
-This creates a cell that spans two rows and two columns in the top-left corner.
+This creates a complex merged structure:
+
+```
++--------+--------+----------+
+|                 | Header 2 |
+|     Header 1    +----------+
+|                 | Header 3 |
++--------+--------+----------+
+| Data 1 |                   |
++--------+      Data 2       +
+| Data 2 |                   |
++--------+-------------------+
+```
 
 ## Cell Styling
 
