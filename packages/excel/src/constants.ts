@@ -31,8 +31,8 @@ export const Color = {
  * A collection of standardized font sizes for various text elements.
  *
  * The `FontSize` object provides numeric values for font sizes, organized by usage context:
- * - Caption, Footnote, BodySmall: Small text for captions, footnotes, and small body text.
- * - Body, BodyLarge: Default and large body text.
+ * - Caption, Footnote: Small text for captions, footnotes.
+ * - BodySmall, Body, BodyLarge: Small body text, default and large body text.
  * - Subheading: For subheadings.
  * - TitleSmall, Title, TitleLarge: For different levels of titles.
  * - HeadingSmall, Heading, HeadingLarge: For section headings.

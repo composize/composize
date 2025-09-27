@@ -1,4 +1,4 @@
-import { Cell, CellValue, Workbook, Worksheet } from 'exceljs';
+import { CellValue, Style, Workbook, Worksheet } from 'exceljs';
 import { DEFAULT_COLUMN_WIDTH, DEFAULT_FONT_SIZE } from './constants';
 import { isChineseOrPunctuation } from './utils';
 
@@ -77,7 +77,7 @@ export function row(composable: () => void) {
   return currentWorksheet.getRow(currentRowNumber++)
 }
 
-export type CellOptions = Partial<{ colSpan: number, rowSpan: number } & Pick<Cell, 'numFmt' | 'font' | 'alignment' | 'border' | 'fill'>>
+export type CellOptions = Partial<{ colSpan: number, rowSpan: number } & Style>
 
 /**
  * Creates and configures a cell within the current worksheet at the current row and column position.

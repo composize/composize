@@ -61,18 +61,19 @@ The `@composize/excel` DSL uses a functional composition pattern where parent el
 
 The `@composize/excel` DSL includes the following key features:
 
-| Function         | Description                                      | Parameters                             | Returns     |
-| ---------------- | ------------------------------------------------ | -------------------------------------- | ----------- |
-| `workbook()`     | Creates a new workbook                           | `composable: () => void`               | `Workbook`  |
-| `worksheet()`    | Adds a new worksheet to the current workbook     | `name: string, composable: () => void` | `Worksheet` |
-| `row()`          | Adds a new row to the current worksheet          | `composable: () => void`               | `Row`       |
-| `cell()`         | Adds a cell to the current row                   | `value: string, options?: CellOptions` | `Cell`      |
-| `borderedCell()` | Adds a cell with thin borders to the current row | `value: string, options?: CellOptions` | `Cell`      |
-| `centeredCell()` | Adds a centered cell to the current row          | `value: string, options?: CellOptions` | `Cell`      |
+| Function         | Description                                      | Parameters                             | Returns       |
+| ---------------- | ------------------------------------------------ | -------------------------------------- | ------------- |
+| `workbook()`     | Creates a new workbook                           | `composable: () => void`               | `Workbook`    |
+| `worksheet()`    | Adds a new worksheet to the current workbook     | `name: string, composable: () => void` | `Worksheet`   |
+| `row()`          | Adds a new row to the current worksheet          | `composable: () => void`               | `Row`         |
+| `cell()`         | Adds a cell to the current row                   | `value: string, options?: CellOptions` | `Cell`        |
+| `borderedCell()` | Adds a cell with thin borders to the current row | `value: string, options?: CellOptions` | `Cell`        |
+| `centeredCell()` | Adds a centered cell to the current row          | `value: string, options?: CellOptions` | `Cell`        |
+| `fillSolid()`    | Creates a solid fill style for cells             | `fgColor: string, bgColor?: string`    | `FillPattern` |
 
 ### CellOptions
 
-The `cell()` and `borderedCell()` functions accept an optional options parameter that allows for cell styling and merging:
+The `cell()` functions accept an optional options parameter that allows for cell styling and merging:
 
 | Option      | Type        | Description                               |
 | ----------- | ----------- | ----------------------------------------- |
@@ -207,7 +208,15 @@ The `cell()` function accepts styling options from ExcelJS's Cell object:
 cell('Styled Text', {
   font: { bold: true, size: 14 },
   alignment: { vertical: 'middle', horizontal: 'center' },
-  fill: { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FFFF0000' } }
+  fill: { type: 'pattern', pattern: 'solid', fgColor: { argb: Color.Red } }
+});
+```
+
+You can create fill patterns using the `fillSolid()` helper function:
+
+```ts
+cell('Solid Fill', {
+  fill: fillSolid(Color.LightBlue)
 });
 ```
 
@@ -241,53 +250,143 @@ The `centeredCell()` function accepts the same options as `borderedCell()`, but 
 
 The Excel DSL automatically adjusts column widths based on the content of each cell. For merged cells, auto-fitting enables text wrapping instead of increasing width.
 
+## Constants
+
+### Color
+
+Predefined ARGB color values for Excel styling:
+
+| Constant         | Value      | Color   |
+| ---------------- | ---------- | ------- |
+| Color.DarkRed    | `ffc00000` | #c00000 |
+| Color.Red        | `ffff0000` | #ff0000 |
+| Color.Orange     | `ffffc000` | #ffc000 |
+| Color.Yellow     | `ffffff00` | #ffff00 |
+| Color.LightGreen | `ff92d050` | #92d050 |
+| Color.Green      | `ff00b050` | #00b050 |
+| Color.LightBlue  | `ff00b0f0` | #00b0f0 |
+| Color.Blue       | `ff0070c0` | #0070c0 |
+| Color.DarkBlue   | `ff002060` | #002060 |
+| Color.Purple     | `ff7030a0` | #7030a0 |
+
+### FontSize
+
+Standardized font sizes organized by usage context:
+
+<table>
+  <tr>
+    <th>Category</th>
+    <th>Constant</th>
+    <th>Value</th>
+  </tr>
+  <tr>
+    <td>Caption</td>
+    <td>FontSize.Caption</td>
+    <td align="right">8</td>
+  </tr>
+  <tr>
+    <td>Footnote</td>
+    <td>FontSize.Footnote</td>
+    <td align="right">9</td>
+  </tr>
+  <tr>
+    <td rowspan="3">Body Text</td>
+    <td>FontSize.BodySmall</td>
+    <td align="right">10</td>
+  </tr>
+  <tr>
+    <td>FontSize.Body</td>
+    <td align="right">11</td>
+  </tr>
+  <tr>
+    <td>FontSize.BodyLarge</td>
+    <td align="right">12</td>
+  </tr>
+  <tr>
+    <td>Subheading</td>
+    <td>FontSize.Subheading</td>
+    <td align="right">14</td>
+  </tr>
+  <tr>
+    <td rowspan="3">Titles</td>
+    <td>FontSize.TitleSmall</td>
+    <td align="right">16</td>
+  </tr>
+  <tr>
+    <td>FontSize.Title</td>
+    <td align="right">18</td>
+  </tr>
+  <tr>
+    <td>FontSize.TitleLarge</td>
+    <td align="right">20</td>
+  </tr>
+  <tr>
+    <td rowspan="3">Headings</td>
+    <td>FontSize.HeadingSmall</td>
+    <td align="right">22</td>
+  </tr>
+  <tr>
+    <td>FontSize.Heading</td>
+    <td align="right">24</td>
+  </tr>
+  <tr>
+    <td>FontSize.HeadingLarge</td>
+    <td align="right">26</td>
+  </tr>
+  <tr>
+    <td rowspan="4">Display</td>
+    <td>FontSize.DisplaySmall</td>
+    <td align="right">28</td>
+  </tr>
+  <tr>
+    <td>FontSize.Display</td>
+    <td align="right">36</td>
+  </tr>
+  <tr>
+    <td>FontSize.DisplayLarge</td>
+    <td align="right">48</td>
+  </tr>
+  <tr>
+    <td>FontSize.DisplayXL</td>
+    <td align="right">72</td>
+  </tr>
+</table>
+
 ## Complete Example
 
 Here's a more complex example that demonstrates many features of the Excel DSL:
 
 ```ts
+const headers = ['Category', 'Q1', 'Q2', 'Q3'];
+const data = [
+  { category: 'Revenue', q1: 10000, q2: 12000, q3: 15000 },
+  { category: 'Expenses', q1: 8000, q2: 8500, q3: 9000 },
+  { category: 'Profit', q1: 2000, q2: 3500, q3: 6000 }
+];
 const book = workbook(() => {
   worksheet('Report', () => {
     // Header row with merged title
     row(() => {
       centeredCell('Quarterly Report', {
-        colSpan: 4,
-        font: { bold: true, size: 16 }
+        colSpan: headers.length,
+        font: { bold: true, size: FontSize.TitleSmall }
       });
     });
-
-    // Empty row for spacing
-    row(() => {});
-
     // Column headers
     row(() => {
-      const headers = ['Category', 'Q1', 'Q2', 'Q3'];
       for (const header of headers) {
         borderedCell(header, { font: { bold: true } });
       }
     });
-
     // Data rows
-    row(() => {
-      borderedCell('Revenue');
-      borderedCell(10000, { numFmt: '$#,##0' });
-      borderedCell(12000, { numFmt: '$#,##0' });
-      borderedCell(15000, { numFmt: '$#,##0' });
-    });
-
-    row(() => {
-      borderedCell('Expenses');
-      borderedCell(8000, { numFmt: '$#,##0' });
-      borderedCell(8500, { numFmt: '$#,##0' });
-      borderedCell(9000, { numFmt: '$#,##0' });
-    });
-
-    row(() => {
-      borderedCell('Profit', { font: { bold: true } });
-      borderedCell(2000, { numFmt: '$#,##0', font: { bold: true } });
-      borderedCell(3500, { numFmt: '$#,##0', font: { bold: true } });
-      borderedCell(6000, { numFmt: '$#,##0', font: { bold: true } });
-    });
+    for (const item of data) {
+      row(() => {
+        borderedCell(item.category);
+        borderedCell(item.q1, { numFmt: '$#,##0' });
+        borderedCell(item.q2, { numFmt: '$#,##0' });
+        borderedCell(item.q3, { numFmt: '$#,##0' });
+      });
+    }
   });
 });
 
