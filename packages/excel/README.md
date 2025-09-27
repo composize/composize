@@ -256,18 +256,18 @@ The Excel DSL automatically adjusts column widths based on the content of each c
 
 Predefined ARGB color values for Excel styling:
 
-| Constant         | Value      | Color   |
-| ---------------- | ---------- | ------- |
-| Color.DarkRed    | `ffc00000` | #c00000 |
-| Color.Red        | `ffff0000` | #ff0000 |
-| Color.Orange     | `ffffc000` | #ffc000 |
-| Color.Yellow     | `ffffff00` | #ffff00 |
-| Color.LightGreen | `ff92d050` | #92d050 |
-| Color.Green      | `ff00b050` | #00b050 |
-| Color.LightBlue  | `ff00b0f0` | #00b0f0 |
-| Color.Blue       | `ff0070c0` | #0070c0 |
-| Color.DarkBlue   | `ff002060` | #002060 |
-| Color.Purple     | `ff7030a0` | #7030a0 |
+| Constant         | Value      | Color     |
+| ---------------- | ---------- | --------- |
+| Color.DarkRed    | `ffc00000` | `#c00000` |
+| Color.Red        | `ffff0000` | `#ff0000` |
+| Color.Orange     | `ffffc000` | `#ffc000` |
+| Color.Yellow     | `ffffff00` | `#ffff00` |
+| Color.LightGreen | `ff92d050` | `#92d050` |
+| Color.Green      | `ff00b050` | `#00b050` |
+| Color.LightBlue  | `ff00b0f0` | `#00b0f0` |
+| Color.Blue       | `ff0070c0` | `#0070c0` |
+| Color.DarkBlue   | `ff002060` | `#002060` |
+| Color.Purple     | `ff7030a0` | `#7030a0` |
 
 ### FontSize
 
