@@ -75,15 +75,16 @@ The `@composize/excel` DSL includes the following key features:
 
 The `cell()` functions accept an optional options parameter that allows for cell styling and merging:
 
-| Option      | Type        | Description                               |
-| ----------- | ----------- | ----------------------------------------- |
-| `colSpan`   | `number`    | Number of columns to merge                |
-| `rowSpan`   | `number`    | Number of rows to merge                   |
-| `numFmt`    | `string`    | Number format string                      |
-| `font`      | `Font`      | Font properties (size, name, color, etc.) |
-| `alignment` | `Alignment` | Text alignment properties                 |
-| `border`    | `Borders`   | Cell border properties                    |
-| `fill`      | `Fill`      | Cell background fill properties           |
+| Option       | Type         | Description                               |
+| ------------ | ------------ | ----------------------------------------- |
+| `colSpan`    | `number`     | Number of columns to merge                |
+| `rowSpan`    | `number`     | Number of rows to merge                   |
+| `numFmt`     | `string`     | Number format string                      |
+| `font`       | `Font`       | Font properties (size, name, color, etc.) |
+| `alignment`  | `Alignment`  | Text alignment properties                 |
+| `border`     | `Borders`    | Cell border properties                    |
+| `fill`       | `Fill`       | Cell background fill properties           |
+| `protection` | `Protection` | Cell protection properties                |
 
 ## Basic Usage
 
@@ -140,7 +141,7 @@ const book = workbook(() => {
 
 ## Cell Merging
 
-The Excel DSL supports merging cells both horizontally (using `colSpan`) and vertically (using `rowSpan`):
+The `@composize/excel` DSL supports merging cells both horizontally (using `colSpan`) and vertically (using `rowSpan`):
 
 ### Horizontal Merging (Column Span)
 
@@ -229,7 +230,7 @@ This creates a complex merged structure:
 +--------+--------+----------+
 | Data 1 |                   |
 +--------+      Data 2       +
-| Data 2 |                   |
+| Data 3 |                   |
 +--------+-------------------+
 ```
 
@@ -243,6 +244,15 @@ The `cell()` function accepts styling options from ExcelJS's Cell object:
 cell('Styled Text', {
   font: { bold: true, size: 14 },
   alignment: { vertical: 'middle', horizontal: 'center' },
+});
+```
+
+### Fill
+
+You can apply background fills to cells using the `fill` option. For example, to apply a solid fill:
+
+```ts
+cell('Solid Fill', {
   fill: { type: 'pattern', pattern: 'solid', fgColor: { argb: Color.Red } }
 });
 ```
@@ -251,11 +261,11 @@ You can create fill patterns using the `fillSolid()` helper function:
 
 ```ts
 cell('Solid Fill', {
-  fill: fillSolid(Color.LightBlue)
+  fill: fillSolid(Color.Red)
 });
 ```
 
-### Bordered Cells
+### Bordered
 
 For convenience, the DSL provides a `borderedCell()` function that applies thin borders to all sides of a cell:
 
@@ -268,9 +278,9 @@ row(() => {
 
 The `borderedCell()` function accepts the same options as `cell()`, but automatically adds thin borders.
 
-### Centered Cells
+### Centered
 
-For convenience, DSL also provides a `centeredCell()` function, which builds on top of `borderedCell()` and applies centered alignment to the cell.
+For convenience, the DSL also provides a `centeredCell()` function, which builds on top of `borderedCell()` and applies centered alignment to the cell.
 
 ```ts
 row(() => {
@@ -281,9 +291,19 @@ row(() => {
 
 The `centeredCell()` function accepts the same options as `borderedCell()`, but automatically adds centered alignment.
 
-## Auto-fitting Columns
+### Protected
 
-The Excel DSL automatically adjusts column widths based on the content of each cell. For merged cells, auto-fitting enables text wrapping instead of increasing width.
+You can protect cells from editing using the `protection` option:
+
+```ts
+cell('Protected Cell', {
+  protection: { locked: true }
+});
+```
+
+## Automatic Column Widths
+
+The `@composize/excel` DSL automatically adjusts column widths based on the content of each cell. For merged cells, auto-fitting enables text wrapping instead of increasing width.
 
 ## Constants
 
@@ -389,7 +409,7 @@ Standardized font sizes organized by usage context:
 
 ## Complete Example
 
-Here's a more complex example that demonstrates many features of the Excel DSL:
+Here's a more complex example that demonstrates many features of the `@composize/excel` DSL:
 
 ```ts
 const headers = ['Category', 'Q1', 'Q2', 'Q3'];
