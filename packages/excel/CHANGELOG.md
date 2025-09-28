@@ -1,3 +1,13 @@
+## 0.1.0 (2025-09-28)
+
+### 🚀 Features
+
+- **excel:** add fillSolid function for solid fill patterns ([c28ca31](https://github.com/composize/composize/commit/c28ca31))
+
+### ❤️ Thank You
+
+- HyperLife1119 @HyperLife1119
+
 ## 0.0.11 (2025-09-25)
 
 ### 🚀 Features
