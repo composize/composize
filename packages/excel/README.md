@@ -53,6 +53,7 @@ graph LR
     row --> cell
     row --> borderedCell
     row --> centeredCell
+    advance
 ```
 
 The `@composize/excel` DSL uses a functional composition pattern where parent elements accept callback functions that define their children. This creates a natural nesting structure that makes the code's visual layout reflect the structure of the resulting Excel document.
@@ -70,6 +71,7 @@ The `@composize/excel` DSL includes the following key features:
 | `borderedCell()` | Adds a cell with thin borders to the current row | `value: string, options?: CellOptions` | `Cell`        |
 | `centeredCell()` | Adds a centered cell to the current row          | `value: string, options?: CellOptions` | `Cell`        |
 | `fillSolid()`    | Creates a solid fill style for cells             | `fgColor: string, bgColor?: string`    | `FillPattern` |
+| `advance()`      | Advance to row or column                         | `delta?: number`                       | `void`        |
 
 ### CellOptions
 
@@ -165,9 +167,9 @@ This creates a header cell that spans across three columns:
 ```
 +--------+--------+--------+
 |       Wide Header        |
-|--------------------------+
++--------+--------+--------+
 | Data 1 | Data 2 | Data 3 |
-+--------+-----------------+
++--------+--------+--------+
 ```
 
 ### Vertical Merging (Row Span)
@@ -232,6 +234,38 @@ This creates a complex merged structure:
 +--------+      Data 2       +
 | Data 3 |                   |
 +--------+-------------------+
+```
+
+## Advanced
+
+The `advance()` function allows you to move the current position by a specified number of rows or columns. By default, it advances by one row or column:
+
+```ts
+row(() => {
+  cell('Cell 1');
+  advance();   // → Move back one column
+  cell('Cell 3');
+});
+advance();     // ↓ Move down two rows
+row(() => {
+  cell('Cell 1');
+  advance(2);  // → Move back one column
+  cell('Cell 4');
+  advance(-3); // ← Move forward three column
+  cell('Cell 2');
+});
+```
+
+This creates the following layout:
+
+```
++--------+--------+--------+--------+
+| Cell 1 |        | Cell 3 |        |
++--------+--------+--------+--------+
+|        |        |        |        |
++--------+--------+--------+--------+
+| Cell 1 | Cell 2 |        | Cell 4 |
++--------+--------+--------+--------+
 ```
 
 ## Cell Styling

@@ -1,4 +1,4 @@
-import { borderedCell, cell, centeredCell, row, workbook, worksheet } from './dsl';
+import { advance, borderedCell, cell, centeredCell, row, workbook, worksheet } from './dsl';
 
 describe('Excel DSL', () => {
 
@@ -262,4 +262,91 @@ describe('Excel DSL', () => {
     expect(createdCell.alignment?.vertical).toBe('middle');
   });
 
+  it('advance should move to the next column when inside a row', () => {
+    const book = workbook(() => {
+      row(() => {
+        cell('a');
+        advance();
+        cell('b');
+      });
+    });
+
+    const sheet = book.worksheets[0];
+
+    expect(sheet.getRow(1).getCell(1).value).toBe('a');
+    expect(sheet.getRow(1).getCell(2).value).toBeFalsy();
+    expect(sheet.getRow(1).getCell(3).value).toBe('b');
+  });
+
+  it('advance should move to the next row when used outside of a row (suspended rows)', () => {
+    const book = workbook(() => {
+      advance();
+      row(() => {
+        cell('x');
+      });
+    });
+    const sheet = book.worksheets[0];
+
+    expect(sheet.getRow(1).getCell(1).value).toBeFalsy();
+    expect(sheet.getRow(2).getCell(1).value).toBe('x');
+  });
+
+  it('advance with negative steps should move multiple columns or rows', () => {
+    const book = workbook(() => {
+      row(() => {
+        cell('c1');
+        advance(2); // move to cell 4
+        cell('c4');
+      });
+      advance(2); // move to row 4
+      row(() => {
+        cell('r4c1');
+      });
+    });
+    const sheet = book.worksheets[0];
+
+    expect(sheet.getRow(1).getCell(1).value).toBe('c1');
+    expect(sheet.getRow(1).getCell(4).value).toBe('c4');
+    expect(sheet.getRow(4).getCell(1).value).toBe('r4c1');
+  });
+
+  it('should support advance across multiple worksheets', () => {
+    const book = workbook(() => {
+      worksheet('Sheet 1', () => {
+        advance();
+        row(() => {
+          cell('Data 1');
+        });
+      });
+
+      worksheet('Sheet 2', () => {
+        row(() => {
+          advance();
+          cell('Data 2');
+        });
+      });
+    });
+
+    expect(book.worksheets[0].getRow(1).getCell(1).value).toBeFalsy();
+    expect(book.worksheets[0].getRow(2).getCell(1).value).toBe('Data 1');
+
+    expect(book.worksheets[1].getRow(1).getCell(1).value).toBeFalsy();
+    expect(book.worksheets[1].getRow(1).getCell(2).value).toBe('Data 2');
+  })
+
+  it('should be support advance with negative steps', () => {
+    const book = workbook(() => {
+      advance(2);
+      advance(-1);
+      row(() => {
+        advance(2);
+        advance(-1);
+        cell('Data 2');
+      });
+    });
+
+    expect(book.worksheets[0].getRow(1).getCell(1).value).toBeFalsy();
+    expect(book.worksheets[0].getRow(2).getCell(1).value).toBeFalsy();
+    expect(book.worksheets[0].getRow(2).getCell(2).value).toBe('Data 2');
+  });
 });

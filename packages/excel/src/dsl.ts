@@ -1,13 +1,14 @@
-import { CellValue, Style, Workbook, Worksheet } from 'exceljs';
+import { CellValue, Row, Style, Workbook, Worksheet } from 'exceljs';
 import { DEFAULT_COLUMN_WIDTH, DEFAULT_FONT_SIZE } from './constants';
 import { isChineseOrPunctuation } from './utils';
 
 let currentWorkbook: Workbook
 let currentWorksheet: Worksheet;
+let currentRow: Row | undefined;
 let currentRowNumber = 1;
 let currentColNumber = 1;
 
-const suspendRows: (() => void)[] = [];
+const suspendedOperations: (() => void)[] = [];
 // Record the positions to skip creating cells, key is the row number, value is the set of columns to skip
 // { [row: number]: cell[] }
 const mergedCells = new Map<number, Set<number>>();
@@ -24,13 +25,13 @@ export function workbook(composable: () => void): Workbook {
   currentWorkbook = new Workbook();
   composable();
   // If there are suspended rows, it means that the current worksheet has not been created, and a default worksheet is automatically created
-  if (suspendRows.length) {
+  if (suspendedOperations.length) {
     worksheet('Sheet1', () => {
-      for (const suspendRow of suspendRows) {
-        suspendRow();
+      for (const operation of suspendedOperations) {
+        operation();
       }
     })
-    suspendRows.length = 0
+    suspendedOperations.length = 0
   }
   return currentWorkbook;
 }
@@ -67,14 +68,17 @@ export function worksheet(name: string, composable: () => void) {
  * @param composable - A function that contains calls to cell definition functions (e.g., `cell`) for the current row.
  */
 export function row(composable: () => void) {
-  // If the worksheet has not been created yet, suspend the current row
+  // If the worksheet has not been created yet, suspend the current operation
   if (!currentWorksheet) {
-    suspendRows.push(() => row(composable));
+    suspendedOperations.push(() => row(composable));
     return;
   }
   currentColNumber = 1;
+  currentRow = currentWorksheet.getRow(currentRowNumber);
   composable();
-  return currentWorksheet.getRow(currentRowNumber++)
+  currentRowNumber++;
+  currentRow = undefined;
+  return currentRow;
 }
 
 export type CellOptions = Partial<{ colSpan: number, rowSpan: number } & Style>
@@ -152,6 +156,26 @@ export function centeredCell(value: CellValue, options: CellOptions = {}) {
     alignment: { horizontal: 'center', vertical: 'middle' },
     ...options
   });
+}
+
+/**
+ * Advance to row or column
+ *
+ * @param delta - Number of positions to move forward. Defaults to `1`. A
+ *   negative value can be used to move backwards.
+ */
+export function advance(delta = 1) {
+  // If the worksheet has not been created yet, suspend the current operation
+  if (!currentWorksheet) {
+    suspendedOperations.push(() => advance(delta));
+    return;
+  }
+
+  if (currentRow) {
+    currentColNumber += delta;
+  } else {
+    currentRowNumber += delta;
+  }
 }
 
 function autoFitColumns() {
