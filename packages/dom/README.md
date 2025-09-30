@@ -3,6 +3,7 @@
 [![version](https://img.shields.io/npm/v/@composize/dom/latest.svg)](https://www.npmjs.com/package/@composize/dom)
 ![CI](https://github.com/composize/composize/actions/workflows/ci.yml/badge.svg)
 ![License](https://img.shields.io/badge/License-MIT-blue.svg)
+[![codecov](https://codecov.io/gh/composize/composize/branch/main/graph/badge.svg?token=070GEU44U0)](https://codecov.io/gh/composize/composize)
 [![CodeFactor](https://www.codefactor.io/repository/github/composize/composize/badge)](https://www.codefactor.io/repository/github/composize/composize)
 
 A declarative DSL for creating and manipulating DOM elements.
