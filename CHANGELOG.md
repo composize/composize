@@ -1,3 +1,14 @@
+## 0.2.0 (2025-09-30)
+
+### 🚀 Features
+
+- **excel:** add advance function to navigate rows and columns ([634b477](https://github.com/composize/composize/commit/634b477))
+- **excel:** update DSL functions to accept context parameters ([8d4b88f](https://github.com/composize/composize/commit/8d4b88f))
+
+### ❤️ Thank You
+
+- HyperLife1119 @HyperLife1119
+
 ## 0.1.0 (2025-09-28)
 
 ### 🚀 Features
