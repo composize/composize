@@ -1,6 +1,5 @@
-import { CellValue, Row, Style, Workbook, Worksheet } from 'exceljs';
-import { DEFAULT_COLUMN_WIDTH, DEFAULT_FONT_SIZE } from './constants';
-import { isChineseOrPunctuation } from './utils';
+import { Cell, CellValue, Row, Style, Workbook, Worksheet } from 'exceljs';
+import { autoFitColumns } from './utils';
 
 let currentWorkbook: Workbook
 let currentWorksheet: Worksheet;
@@ -9,8 +8,12 @@ let currentRowNumber = 1;
 let currentColNumber = 1;
 
 const suspendedOperations: (() => void)[] = [];
-// Record the positions to skip creating cells, key is the row number, value is the set of columns to skip
-// { [row: number]: cell[] }
+/**
+ * Map to track merged cells in the current worksheet.
+ *
+ * The key is the row number, and the value is a set of column numbers that are part of merged cells.
+ * This helps to skip creating individual cells in these positions when defining rows.
+ */
 const mergedCells = new Map<number, Set<number>>();
 
 /**
@@ -21,9 +24,9 @@ const mergedCells = new Map<number, Set<number>>();
  * @param composable - A function that defines the content of the workbook using other DSL functions (e.g., `worksheet`, `row`).
  * @returns The newly created Workbook object populated by the composable function.
  */
-export function workbook(composable: () => void): Workbook {
+export function workbook(composable: (it: Workbook) => void): Workbook {
   currentWorkbook = new Workbook();
-  composable();
+  composable(currentWorkbook);
   // If there are suspended rows, it means that the current worksheet has not been created, and a default worksheet is automatically created
   if (suspendedOperations.length) {
     worksheet('Sheet1', () => {
@@ -49,15 +52,15 @@ export function workbook(composable: () => void): Workbook {
  *                     the content (rows, cells, etc.) of this worksheet. DSL functions
  *                     called within this callback will operate on the newly created worksheet.
  */
-export function worksheet(name: string, composable: () => void) {
+export function worksheet(name: string, composable: (it: Worksheet) => void): Worksheet {
   currentWorksheet = currentWorkbook.addWorksheet(name);
   currentRowNumber = 1;
-  composable?.();
+  composable(currentWorksheet);
   mergedCells.clear()
-  autoFitColumns();
-  const ws = currentWorksheet;
+  autoFitColumns(currentWorksheet);
+  const tmp = currentWorksheet;
   currentWorksheet = undefined!;
-  return ws;
+  return tmp;
 }
 
 /**
@@ -67,7 +70,7 @@ export function worksheet(name: string, composable: () => void) {
  *
  * @param composable - A function that contains calls to cell definition functions (e.g., `cell`) for the current row.
  */
-export function row(composable: () => void) {
+export function row(composable: (it: Row) => void): Row | void {
   // If the worksheet has not been created yet, suspend the current operation
   if (!currentWorksheet) {
     suspendedOperations.push(() => row(composable));
@@ -75,10 +78,11 @@ export function row(composable: () => void) {
   }
   currentColNumber = 1;
   currentRow = currentWorksheet.getRow(currentRowNumber);
-  composable();
+  composable(currentRow);
   currentRowNumber++;
+  const tmp = currentRow;
   currentRow = undefined;
-  return currentRow;
+  return tmp;
 }
 
 export type CellOptions = Partial<{ colSpan: number, rowSpan: number } & Style>
@@ -90,7 +94,7 @@ export type CellOptions = Partial<{ colSpan: number, rowSpan: number } & Style>
  * @param options Optional configuration for the cell.
  * @returns The `exceljs.Cell` object that was created and configured.
  */
-export function cell(value: CellValue, options: CellOptions = {}) {
+export function cell(value: CellValue, options: CellOptions = {}): Cell {
   // If the current column is marked as skipped, automatically skip all skipped cells
   while (mergedCells.get(currentRowNumber)?.has(currentColNumber)) {
     currentColNumber++;
@@ -133,7 +137,7 @@ export function cell(value: CellValue, options: CellOptions = {}) {
  * @param options - Optional configuration for the cell.
  * @returns The `exceljs.Cell` object that was created and configured.
  */
-export function borderedCell(value: CellValue, options: CellOptions = {}) {
+export function borderedCell(value: CellValue, options: CellOptions = {}): Cell {
   return cell(value, {
     border: {
       top: { style: 'thin' },
@@ -151,7 +155,7 @@ export function borderedCell(value: CellValue, options: CellOptions = {}) {
  * @param value - The value to be placed into the cell.
  * @param options - Optional configuration for the cell.
  */
-export function centeredCell(value: CellValue, options: CellOptions = {}) {
+export function centeredCell(value: CellValue, options: CellOptions = {}): Cell {
   return borderedCell(value, {
     alignment: { horizontal: 'center', vertical: 'middle' },
     ...options
@@ -164,7 +168,7 @@ export function centeredCell(value: CellValue, options: CellOptions = {}) {
  * @param delta - Number of positions to move forward. Defaults to `1`. A
  *   negative value can be used to move backwards.
  */
-export function advance(delta = 1) {
+export function advance(delta = 1): void {
   // If the worksheet has not been created yet, suspend the current operation
   if (!currentWorksheet) {
     suspendedOperations.push(() => advance(delta));
@@ -175,23 +179,5 @@ export function advance(delta = 1) {
     currentColNumber += delta;
   } else {
     currentRowNumber += delta;
-  }
-}
-
-function autoFitColumns() {
-  for (const column of currentWorksheet.columns) {
-    let maxLength = DEFAULT_COLUMN_WIDTH;
-    column.eachCell?.(cell => {
-      // If the cell is a merged cell, skip the width calculation and allow line breaks
-      if (cell.isMerged) {
-        cell.alignment = { wrapText: true, ...cell.alignment }
-      } else {
-        const cellValue = cell.value ? cell.value.toString() : '';
-        const fontSize = cell.font?.size || DEFAULT_FONT_SIZE;
-        const width = [...cellValue].map(char => isChineseOrPunctuation(char) ? 2 : 1).reduce((a, b) => a + b, 0);
-        maxLength = Math.max(maxLength, width * (fontSize / DEFAULT_FONT_SIZE));
-      }
-    });
-    column.width = maxLength + 2; // Reserve 2 characters of spacing
   }
 }

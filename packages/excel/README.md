@@ -62,16 +62,16 @@ The `@composize/excel` DSL uses a functional composition pattern where parent el
 
 The `@composize/excel` DSL includes the following key features:
 
-| Function         | Description                                      | Parameters                             | Returns       |
-| ---------------- | ------------------------------------------------ | -------------------------------------- | ------------- |
-| `workbook()`     | Creates a new workbook                           | `composable: () => void`               | `Workbook`    |
-| `worksheet()`    | Adds a new worksheet to the current workbook     | `name: string, composable: () => void` | `Worksheet`   |
-| `row()`          | Adds a new row to the current worksheet          | `composable: () => void`               | `Row`         |
-| `cell()`         | Adds a cell to the current row                   | `value: string, options?: CellOptions` | `Cell`        |
-| `borderedCell()` | Adds a cell with thin borders to the current row | `value: string, options?: CellOptions` | `Cell`        |
-| `centeredCell()` | Adds a centered cell to the current row          | `value: string, options?: CellOptions` | `Cell`        |
-| `fillSolid()`    | Creates a solid fill style for cells             | `fgColor: string, bgColor?: string`    | `FillPattern` |
-| `advance()`      | Advance to row or column                         | `delta?: number`                       | `void`        |
+| Function         | Description                                      | Parameters                                          | Returns       |
+| ---------------- | ------------------------------------------------ | --------------------------------------------------- | ------------- |
+| `workbook()`     | Creates a new workbook                           | `composable: (it: Workbook) => void`                | `Workbook`    |
+| `worksheet()`    | Adds a new worksheet to the current workbook     | `name: string, composable: (it: Worksheet) => void` | `Worksheet`   |
+| `row()`          | Adds a new row to the current worksheet          | `composable: (it: Row) => void`                     | `Row`         |
+| `cell()`         | Adds a cell to the current row                   | `value: string, options?: CellOptions`              | `Cell`        |
+| `borderedCell()` | Adds a cell with thin borders to the current row | `value: string, options?: CellOptions`              | `Cell`        |
+| `centeredCell()` | Adds a centered cell to the current row          | `value: string, options?: CellOptions`              | `Cell`        |
+| `fillSolid()`    | Creates a solid fill style for cells             | `fgColor: string, bgColor?: string`                 | `FillPattern` |
+| `advance()`      | Advance to row or column                         | `delta?: number`                                    | `void`        |
 
 ### CellOptions
 
