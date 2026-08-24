@@ -8,7 +8,8 @@
     "emitDeclarationOnly": false,
     "forceConsistentCasingInFileNames": true,
     "lib": [
-      "dom"
+      "dom",
+      "es2022",
     ]
   },
   "include": [

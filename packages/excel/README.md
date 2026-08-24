@@ -247,12 +247,12 @@ row(() => {
   advance();   // → Move back one column
   cell('Cell 3');
 });
-advance();     // ↓ Move down two rows
+advance();     // ↓ Move down one row
 row(() => {
   cell('Cell 1');
-  advance(2);  // → Move back one column
+  advance(2);  // → Move back two columns
   cell('Cell 4');
-  advance(-3); // ← Move forward three column
+  advance(-3); // ← Move forward three columns
   cell('Cell 2');
 });
 ```

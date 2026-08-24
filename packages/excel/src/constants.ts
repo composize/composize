@@ -27,6 +27,8 @@ export const Color = {
   Purple: 'ff7030a0'
 } as const;
 
+export type Color = (typeof Color)[keyof typeof Color];
+
 /**
  * A collection of standardized font sizes for various text elements.
  *
