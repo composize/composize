@@ -8,6 +8,29 @@
 
 A declarative DSL for creating and manipulating DOM elements.
 
+## Renderer configuration
+
+Configure a renderer before creating nodes. `DomRenderer` is the built-in
+browser implementation and must be instantiated by the caller. A renderer
+implements creation, insertion, property, style, attribute, and event
+operations. Extend `DomRenderer` to override only the behavior you need.
+
+```ts
+import { DomRenderer, setupConfig } from '@composize/dom';
+
+class LoggingRenderer extends DomRenderer {
+  override appendChild(parent: ParentNode, child: Node) {
+    console.debug('append', child);
+    super.appendChild(parent, child);
+  }
+}
+
+setupConfig({ renderer: new LoggingRenderer() });
+```
+
+Use `setupConfig({ renderer: new DomRenderer() })` to restore the built-in
+renderer.
+
 ## Examples
 
 ```ts

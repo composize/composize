@@ -1,11 +1,8 @@
-type PickWritable<T> = {
-  [K in keyof T as IfEquals<{ [Q in K]: T[K] }, { -readonly [Q in K]: T[K] }, K>]: T[K];
-};
-// 辅助类型：判断属性是否为 `readonly`
-type IfEquals<X, Y, A = X> = (<T>() => T extends X ? 1 : 2) extends (<T>() => T extends Y ? 1 : 2) ? A : never;
+import { getRenderer } from './config';
+import type { Attributes, NodeProps, Renderer } from './renderer';
+import { kebabCase } from './utils';
 
-type NodeProps<K extends keyof HTMLElementTagNameMap> = Partial<PickWritable<Omit<HTMLElementTagNameMap[K], 'style'>> & { class: string[] | string, style: Partial<CSSStyleDeclaration> }>;
-type Content = Node | string | number | undefined | null
+export type Content = Node | string | number | undefined | null;
 
 const nodeStack: ParentNode[] = [];
 
@@ -27,7 +24,8 @@ export function element<K extends keyof HTMLElementTagNameMap>(tag: K, composabl
 export function element<K extends keyof HTMLElementTagNameMap>(tag: K, props?: NodeProps<K>, content?: Content): HTMLElementTagNameMap[K];
 export function element<K extends keyof HTMLElementTagNameMap>(tag: K, props?: NodeProps<K>, composable?: () => void): HTMLElementTagNameMap[K];
 export function element<K extends keyof HTMLElementTagNameMap>(tag: K, propsOrContentOrComposable?: NodeProps<K> | Content | (() => void), contentOrComposable?: Content | (() => void)) {
-  const node = document.createElement(tag);
+  const renderer = getRenderer();
+  const node = renderer.createElement(tag);
 
   let props: NodeProps<K> | undefined;
   let content: Content = undefined
@@ -48,7 +46,7 @@ export function element<K extends keyof HTMLElementTagNameMap>(tag: K, propsOrCo
   }
 
   if (props) {
-    applyProps(node, props);
+    setElementProps(node, props, renderer);
   }
 
   enterNode(node);
@@ -56,83 +54,85 @@ export function element<K extends keyof HTMLElementTagNameMap>(tag: K, propsOrCo
     if (composable) {
       composable()
     } else if (content instanceof Node) {
-      node.append(content);
+      renderer.appendChild(node, content);
     } else if (content) {
       text(content)
     }
   } finally {
     leaveNode()
-    getCurrentNode()?.append(node);
+    const parent = getCurrentNode();
+    if (parent) {
+      renderer.appendChild(parent, node);
+    }
   }
 
   return node;
 }
 
-function applyProps<K extends keyof HTMLElementTagNameMap>(node: HTMLElementTagNameMap[K], props: NodeProps<K>) {
-  for (const [key, value] of Object.entries(props)) {
-    switch (key) {
-      case 'class':
-        if (Array.isArray(value)) {
-          node.className = value.join(' ');
-        } else {
-          node.className = value;
-        }
-        break;
-      case 'style':
-        for (const [styleKey, styleValue] of Object.entries(value as CSSStyleDeclaration)) {
-          node.style.setProperty(kebabCase(styleKey), styleValue)
-        }
-        break;
-      default:
-        node[key as keyof HTMLElementTagNameMap[K]] = value;
-    }
-  }
-}
-
 export function fragment(composable?: () => void) {
-  const node = document.createDocumentFragment();
+  const renderer = getRenderer();
+  const node = renderer.createFragment();
   enterNode(node);
   try {
     composable?.()
   } finally {
     leaveNode()
-    getCurrentNode()?.append(node);
+    const parent = getCurrentNode();
+    if (parent) {
+      renderer.appendChild(parent, node);
+    }
   }
   return node;
 }
 
 export function text(content: NonNullable<Content>) {
-  const node = document.createTextNode(content.toString());
-  getCurrentNode()?.append(node);
+  const renderer = getRenderer();
+  const node = renderer.createText(content.toString());
+  const parent = getCurrentNode();
+  if (parent) {
+    renderer.appendChild(parent, node);
+  }
   return node;
 }
 
 export function style(styles: Record<string, Partial<CSSStyleDeclaration>>) {
-  const node = document.createElement('style');
-  node.textContent = cssObjectToText(styles);
-  getCurrentNode()?.append(node);
+  const renderer = getRenderer();
+  const node = renderer.createElement('style');
+  renderer.setValue(node, cssObjectToText(styles));
+  const parent = getCurrentNode();
+  if (parent) {
+    renderer.appendChild(parent, node);
+  }
   return node;
 }
 
 export function inlineStyle(styles: Partial<CSSStyleDeclaration>) {
   const node = getCurrentNode() as HTMLElement;
-  Object.assign(node.style, styles)
+  const renderer = getRenderer();
+  for (const [style, value] of Object.entries(styles)) {
+    renderer.setStyle(node, kebabCase(style), value);
+  }
 }
 
-export function attributes(attrs: Record<string, string | number | boolean>) {
+export function attributes(attrs: Attributes) {
   const node = getCurrentNode() as HTMLElement;
-  for (const [key, value] of Object.entries(attrs)) {
-    node.setAttribute(key, value.toString());
+  const renderer = getRenderer();
+  for (const [name, value] of Object.entries(attrs)) {
+    renderer.setAttribute(node, name, value.toString());
   }
 }
 
 export function append(node: ParentNode, composable?: () => void) {
+  const renderer = getRenderer();
   enterNode(node);
   try {
     composable?.()
   } finally {
     leaveNode()
-    getCurrentNode()?.append(node);
+    const parent = getCurrentNode();
+    if (parent) {
+      renderer.appendChild(parent, node);
+    }
   }
   return node;
 }
@@ -142,11 +142,24 @@ export function listener<K extends keyof HTMLElementEventMap>(
   handler: (event: HTMLElementEventMap[K]) => void,
   options?: AddEventListenerOptions | boolean
 ) {
-  getCurrentNode().addEventListener(eventName, handler as EventListener, options);
+  return getRenderer().listen(getCurrentNode(), eventName, handler as EventListener, options);
 }
 
-function kebabCase(str: string) {
-  return str.replace(/([a-z])([A-Z])/g, '$1-$2').toLowerCase();
+function setElementProps<K extends keyof HTMLElementTagNameMap>(node: HTMLElementTagNameMap[K], props: NodeProps<K>, renderer: Renderer) {
+  for (const [name, value] of Object.entries(props)) {
+    switch (name) {
+      case 'class':
+        renderer.setAttribute(node, 'class', Array.isArray(value) ? value.join(' ') : value as string);
+        break;
+      case 'style':
+        for (const [style, styleValue] of Object.entries(value as CSSStyleDeclaration)) {
+          renderer.setStyle(node, kebabCase(style), styleValue);
+        }
+        break;
+      default:
+        renderer.setProperty(node, name, value);
+    }
+  }
 }
 
 function cssObjectToText(cssObject: Record<string, Partial<CSSStyleDeclaration>>): string {

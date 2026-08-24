@@ -1,6 +1,55 @@
 import { append, attributes, element, fragment, inlineStyle, listener, style, text } from './dsl'
+import { DomRenderer, setupConfig } from './index';
 
 describe('DOM DSL', () => {
+  beforeEach(() => {
+    setupConfig({ renderer: new DomRenderer() });
+  });
+
+  describe('renderer configuration', () => {
+    it('should delegate DOM operations to the configured renderer', () => {
+      class TrackingRenderer extends DomRenderer {}
+
+      const renderer = new TrackingRenderer();
+      const createElement = vi.spyOn(renderer, 'createElement');
+      const appendChild = vi.spyOn(renderer, 'appendChild');
+      const setAttribute = vi.spyOn(renderer, 'setAttribute');
+      const setStyle = vi.spyOn(renderer, 'setStyle');
+      const setProperty = vi.spyOn(renderer, 'setProperty');
+      const setValue = vi.spyOn(renderer, 'setValue');
+      const listen = vi.spyOn(renderer, 'listen');
+      setupConfig({ renderer });
+
+      const handler = vi.fn();
+      let unlisten: () => void = () => undefined;
+      const div = element('div', { class: 'custom-renderer', id: 'renderer', style: { color: 'red' } }, () => {
+        inlineStyle({ backgroundColor: 'blue' });
+        attributes({ 'data-id': 1 });
+        unlisten = listener('click', handler);
+        style({ '.custom-renderer': { fontSize: '16px' } });
+        text('content');
+      });
+
+      expect(createElement).toHaveBeenCalledWith('div');
+      expect(setAttribute).toHaveBeenCalledWith(div, 'class', 'custom-renderer');
+      expect(setAttribute).toHaveBeenCalledWith(div, 'data-id', '1');
+      expect(setStyle).toHaveBeenCalledWith(div, 'color', 'red');
+      expect(setStyle).toHaveBeenCalledWith(div, 'background-color', 'blue');
+      expect(setProperty).toHaveBeenCalledWith(div, 'id', 'renderer');
+      expect(setValue).toHaveBeenCalledWith(expect.any(HTMLStyleElement), '.custom-renderer{font-size:16px;}');
+      expect(listen).toHaveBeenCalledWith(div, 'click', handler, undefined);
+      expect(appendChild).toHaveBeenCalledTimes(2);
+      expect(appendChild).toHaveBeenCalledWith(div, expect.any(Text));
+      expect(div.textContent).toBe('.custom-renderer{font-size:16px;}content');
+
+      div.dispatchEvent(new MouseEvent('click'));
+      expect(handler).toHaveBeenCalledTimes(1);
+      unlisten();
+      div.dispatchEvent(new MouseEvent('click'));
+      expect(handler).toHaveBeenCalledTimes(1);
+    });
+  });
+
   describe('element', () => {
     it('should create an element with text content', () => {
       const div = element('div', 'hello')
