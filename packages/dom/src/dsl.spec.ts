@@ -58,15 +58,10 @@ describe('DOM DSL', () => {
       expect(div.textContent).toBe('hello')
     })
 
-    it('should append a child element', () => {
-      const p = document.createElement('p');
-      p.textContent = 'I am appended';
+    it('should create an element with numeric text content', () => {
+      const div = element('div', 42);
 
-      const div = element('div', p);
-
-      expect(div.children.length).toBe(1);
-      expect(div.firstElementChild).toBe(p);
-      expect(div.textContent).toBe('I am appended');
+      expect(div.textContent).toBe('42');
     })
 
     it('should create an element with props (class and style) and text content', () => {

@@ -2,7 +2,7 @@ import { getRenderer } from './config';
 import type { Attributes, NodeProps, Renderer } from './renderer';
 import { kebabCase } from './utils';
 
-export type Content = Node | string | number | undefined | null;
+export type Content = string | number | undefined | null;
 
 const nodeStack: ParentNode[] = [];
 
@@ -31,9 +31,7 @@ export function element<K extends keyof HTMLElementTagNameMap>(tag: K, propsOrCo
   let content: Content = undefined
   let composable: (() => void) | undefined = undefined;
 
-  if (propsOrContentOrComposable instanceof Node) {
-    contentOrComposable = propsOrContentOrComposable;
-  } else if (typeof propsOrContentOrComposable === 'object' && propsOrContentOrComposable) {
+  if (typeof propsOrContentOrComposable === 'object' && propsOrContentOrComposable) {
     props = propsOrContentOrComposable
   } else {
     contentOrComposable = propsOrContentOrComposable
@@ -53,8 +51,6 @@ export function element<K extends keyof HTMLElementTagNameMap>(tag: K, propsOrCo
   try {
     if (composable) {
       composable()
-    } else if (content instanceof Node) {
-      renderer.appendChild(node, content);
     } else if (content) {
       text(content)
     }
