@@ -54,6 +54,24 @@ describe('Excel DSL', () => {
     expect(book.worksheets[0].getRow(2).getCell(2).value).toBe('value2');
   })
 
+  it('should auto name worksheets correctly', () => {
+    const book = workbook(() => {
+      worksheet(() => {
+        row(() => {
+          cell('data1');
+        });
+      });
+      worksheet(() => {
+        row(() => {
+          cell('data2');
+        });
+      });
+    });
+
+    expect(book.worksheets[0].name).toBe('Sheet1');
+    expect(book.worksheets[1].name).toBe('Sheet2');
+  });
+
   it('should be a workbook and auto add multi worksheets', () => {
     // +--------+--------+
     // | title1 | title2 |

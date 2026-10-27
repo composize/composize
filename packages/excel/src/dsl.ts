@@ -3,6 +3,7 @@ import { autoFitColumns } from './utils';
 
 let currentWorkbook: Workbook
 let currentWorksheet: Worksheet;
+let currentWorksheetCount = 0;
 let currentRow: Row | undefined;
 let currentRowNumber = 1;
 let currentColNumber = 1;
@@ -25,11 +26,12 @@ const mergedCells = new Map<number, Set<number>>();
  * @returns The newly created Workbook object populated by the composable function.
  */
 export function workbook(composable: (it: Workbook) => void): Workbook {
+  currentWorksheetCount = 0;
   currentWorkbook = new Workbook();
   composable(currentWorkbook);
   // If there are suspended rows, it means that the current worksheet has not been created, and a default worksheet is automatically created
   if (suspendedOperations.length) {
-    worksheet('Sheet1', () => {
+    worksheet(() => {
       for (const operation of suspendedOperations) {
         operation();
       }
@@ -52,10 +54,17 @@ export function workbook(composable: (it: Workbook) => void): Workbook {
  *                     the content (rows, cells, etc.) of this worksheet. DSL functions
  *                     called within this callback will operate on the newly created worksheet.
  */
-export function worksheet(name: string, composable: (it: Worksheet) => void): Worksheet {
+export function worksheet(composable: (it: Worksheet) => void): Worksheet
+export function worksheet(name: string, composable: (it: Worksheet) => void): Worksheet
+export function worksheet(nameOrFn: string | ((it: Worksheet) => void), composable?: (it: Worksheet) => void): Worksheet {
+  const name = typeof nameOrFn === 'string' ? nameOrFn : `Sheet${currentWorksheetCount + 1}`;
+  if (typeof nameOrFn === 'function') {
+    composable = nameOrFn;
+  }
   currentWorksheet = currentWorkbook.addWorksheet(name);
+  currentWorksheetCount++;
   currentRowNumber = 1;
-  composable(currentWorksheet);
+  composable?.(currentWorksheet);
   mergedCells.clear()
   autoFitColumns(currentWorksheet);
   const tmp = currentWorksheet;
